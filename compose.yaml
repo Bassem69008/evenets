@@ -4,10 +4,6 @@ services:
   ###> BDD ###
   database:
     image: mysql:8.0
-    #build:
-    #  context: .
-    #  dockerfile: ./docker/mysql/Dockerfile
-    #container_name: 'ecommerce_sf6_database'
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
