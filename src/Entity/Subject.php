@@ -63,7 +63,7 @@ class Subject
     {
         $this->likes = new ArrayCollection();
         $this->created_at = new \DateTimeImmutable();
-        $this->updated = new \DateTimeImmutable();
+        $this->updated_at = new \DateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -82,7 +82,6 @@ class Subject
 
         return $this;
     }
-
 
     public function getDescription(): ?string
     {
@@ -167,7 +166,6 @@ class Subject
 
         return $this;
     }
-
 
     public function getEvents(): ?Events
     {

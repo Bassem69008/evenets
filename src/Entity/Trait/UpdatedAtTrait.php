@@ -1,13 +1,12 @@
 <?php
+
 namespace App\Entity\Trait;
 
 use Doctrine\ORM\Mapping as ORM;
 
-
-trait UpdatedAtTrait{
-
-
-    #[ORM\Column(type: 'datetime_immutable',options:['default'=>'CURRENT_TIMESTAMP'])]
+trait UpdatedAtTrait
+{
+    #[ORM\Column(type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeImmutable $updated_at = null;
 
     public function getUpdatedAt(): ?\DateTimeImmutable
