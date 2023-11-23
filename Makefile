@@ -15,7 +15,7 @@ PHPQA_RUN = $(DOCKER_RUN) --init -it --rm -v $(PWD):/project -w /project $(PHPQA
 start-dev:
 	@docker-compose --env-file ./.env.local up -d;
 	@docker-compose exec webserver php bin/console doctrine:migrations:migrate --no-interaction;
-	#@docker-compose exec webserver php bin/console doctrine:fixtures:load --no-interaction;
+	@docker-compose exec webserver php bin/console doctrine:fixtures:load --no-interaction;
 	@docker-compose exec webserver php bin/console cache:clear --no-optional-warmers;
 
 
@@ -23,7 +23,7 @@ start:
 	@docker-compose up -d;
 	@docker-compose --env-file ./.env.local up -d;
 	@docker-compose exec webserver php bin/console doctrine:migrations:migrate --no-interaction;
-	#@docker-compose exec webserver php bin/console doctrine:fixtures:load --no-interaction;
+	@docker-compose exec webserver php bin/console doctrine:fixtures:load --no-interaction;
 	@docker-compose exec webserver php bin/console cache:clear --no-optional-warmers;
 
 
@@ -58,7 +58,7 @@ setup:
 install:
 	@docker-compose exec webserver composer install --optimize-autoloader --no-scripts --no-interaction --no-progress --prefer-dist
 	@docker-compose exec webserver php bin/console doctrine:migrations:migrate --no-interaction;
-	#@docker-compose exec webserver php bin/console doctrine:fixtures:load --no-interaction;
+	@docker-compose exec webserver php bin/console doctrine:fixtures:load --no-interaction;
 	@docker-compose exec webserver php bin/console cache:clear --no-optional-warmers;
 
 

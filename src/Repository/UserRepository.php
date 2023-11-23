@@ -26,22 +26,20 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         parent::__construct($registry, User::class);
     }
 
-
     public function save(User $user, bool $flush = true): User
     {
         $this->_em->persist($user);
-        if($flush)
-        {
+        if ($flush) {
             $this->_em->flush();
         }
-        return $user ;
+
+        return $user;
     }
 
-    public function remove(User $user , bool $flush = true): void
+    public function remove(User $user, bool $flush = true): void
     {
         $this->_em->remove($user);
-        if($flush)
-        {
+        if ($flush) {
             $this->_em->flush();
         }
     }
@@ -59,6 +57,4 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
     }
-
-
 }

@@ -21,22 +21,20 @@ class SubjectRepository extends ServiceEntityRepository
         parent::__construct($registry, Subject::class);
     }
 
-
-    public function  save(Subject $subject, bool $flush = true): Subject
+    public function save(Subject $subject, bool $flush = true): Subject
     {
         $this->_em->persist($subject);
-        if($flush)
-        {
+        if ($flush) {
             $this->_em->flush();
         }
+
         return $subject;
     }
 
     public function remove(Subject $subject, bool $flush = true): void
     {
         $this->_em->remove($subject);
-        if($flush)
-        {
+        if ($flush) {
             $this->_em->flush();
         }
     }
