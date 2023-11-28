@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des Utilisateurs{% endblock %}
+
+{% block body %}
+<div class="container-fluid" >
+    <h2>Liste des utilisateurs </h2>
+
+    <div class="d-flex justify-content-between">
+    <a href="#" type="button" class="btn btn-primary my-3  " >Ajouter un utilisateur</a>
+    <a href="#" type="button" class="btn btn-info my-3  " >Télécharger un fichier</a>
+
+    </div>
+
+    <div class="col-lg-12 mt-3">
+        <div class="table-responsive">
+            <table class="table table-hover text-nowrap">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Nom</th>
+                    <th scope="col">Prénom</th>
+                    <th scope="col">Roles</th>
+                    <th scope="col">EDITION</th>
+                </tr>
+                </thead>
+            <tbody>
+
+            {% set count = 0 %}
+            {% for user in users %}
+                {% set count = count +1 %}
+                <tr>
+                    <td>{{ count }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.lastname }}</td>
+                    <td>{{ user.firstname }}</td>
+                    <td> {{user.roles|join(', ')}} </td>
+                    <td>
+                        <th>
+                <td><a href="#" type="button" class="btn btn-warning">EDIT</a></td>
+                <td><a href="#" type="button" class="btn btn-info">Afficher</a></td>
+                <td><a href="#" type="button" class="btn btn-danger"> Supprimer</a></td>
+            </th>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

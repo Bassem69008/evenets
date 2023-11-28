@@ -33,7 +33,7 @@ class UserFixtures extends Fixture
         $this->createUser(5, ['ROLE_BOARD'], 'passwordBoard', $manager);
 
         /* Create Users */
-        $this->createUser(20, ['ROLE_USER'], 'passwordBoard', $manager);
+        $this->createUser(20, ['ROLE_USER'], 'passwordUser', $manager);
 
         $manager->flush();
     }
