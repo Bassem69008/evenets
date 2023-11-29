@@ -17,7 +17,7 @@ use function compact;
 use function dd;
 use function json_decode;
 
-#[Route('/admin/users', name:'users_')]
+#[Route('/admin/users', name:'users_', methods: ['get'])]
 class UsersController extends AbstractController
 {
 
@@ -36,7 +36,7 @@ class UsersController extends AbstractController
     }
 
 
-    #[Route('/creation', name: 'create' )]
+    #[Route('/creation', name: 'create', methods: ['post'] )]
     public function add(Request $request)
 
     {
@@ -77,13 +77,14 @@ class UsersController extends AbstractController
         ]);
     }
 
-   #[Route('/{id}/show', name:'show')]
+   #[Route('/{id}/show', name:'show', methods: ['get'])]
     public function show(User $user =null): Response
     {
        if(!$user)
        {
            return $this->render('errors/404.html.twig');
        }
+       dd($user);
        return $this->render('admin/users/show.html.twig',compact('user'));
     }
 

@@ -93,8 +93,14 @@ run-quality-gates:
 	@docker-compose exec webserver vendor/bin/phpstan analyse -c phpstan.dist.neon --memory-limit=-1;
 
 
-run-tests: # run tests
-	@docker-compose exec webserver ./bin/phpunit;
+
+tests: #tests
+	@docker-compose exec webserver php bin/console doctrine:database:drop --force --env=test || true
+	@docker-compose exec webserver php bin/console doctrine:database:create --env=test
+	@docker-compose exec webserver php bin/console doctrine:migrations:migrate -n --env=test
+	@docker-compose exec webserver php bin/console doctrine:fixtures:load -n --env=test
+	@docker-compose exec webserver  ./bin/phpunit
+.PHONY: tests
 
 
 run-tests-with-coverage: # run tests with coverage
