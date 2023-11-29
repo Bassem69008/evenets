@@ -1,40 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>{% block title %}Connexion !{% endblock %} - EVENTS</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
 
-{% block title %}Connexion!{% endblock %}
 
-{% block body %}
-    <section class="container my-3">
-        <div class="row">
-            <div class="col">
-                <form method="post">
-                    {% if error %}
-                        <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-                    {% endif %}
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"  rel="stylesheet"/>
 
-                    {% if app.user %}
-                        <div class="mb-3">
-                            Vous êtes connecté(e) comme{{ app.user.userIdentifier }}, <a href="{{ path('deconnexion') }}">Me déconnecter</a>
-                        </div>
-                    {% endif %}
+    {% block stylesheets %}
+    {% endblock %}
+    <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
+    <!-- fichiers JS -->
+    <!-- Bootstrap core JavaScript
+      ================================================== -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    {% block javascripts %}
+    {% endblock %}
+</head>
+<body style="background-image: url({{ asset('assets/images/bg-login-signup.jpg') }}) ;background-size: cover; background-position: center;background-repeat: no-repeat;min-height:100vh; max-height:10vh;">
 
-                    <h1 class="h3 mb-3 font-weight-normal">Me connecter</h1>
-                    <label for="inputEmail">Email</label>
-                    <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
-                    <label for="inputPassword">Mot de passe</label>
-                    <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
 
-                    <input type="hidden" name="_csrf_token"
-                           value="{{ csrf_token('authenticate') }}"
-                    >
+        {% block body %}
+        {% endblock %}
+        <section class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+            <div class="row">
+                <div class="col-lg-12 mx-auto my-auto " style="background-color: rgba(0,0,0,0.5); padding: 60px; border-radius:5px ">
+                        <form method="post">
+                            {% if error %}
+                                <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                            {% endif %}
 
-                    <button class="btn btn-lg btn-primary mt-3" type="submit">
-                        Me connecter
-                    </button>
-                </form>
+
+                            <h1 class="h3 mb-3 font-weight-normal text-center text-white" style="font-size:40px;text-shadow: 1px 1px #000;">Connexion</h1>
+                            <label for="inputEmail" class="text-white">Email</label>
+                            <input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control my-2" autocomplete="email" required autofocus style="background-color:rgba(255,255,255,0);">
+                            <label for="inputPassword" class="text-white">Mot de passe</label>
+                            <input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+
+                            <input type="hidden" name="_csrf_token"
+                                   value="{{ csrf_token('authenticate') }}"
+                            >
+
+                            <button class="btn btn-sm btn-primary mt-3" type="submit">
+                                Me connecter
+                            </button>
+                        </form>
+                </div>
 
 
             </div>
-        </div>
-    </section>
+        </section>
 
-{% endblock %}
+
+</body>
+</html>
+
+

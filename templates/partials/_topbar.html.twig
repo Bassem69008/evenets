@@ -13,6 +13,13 @@
           <span class="nav-link-text">Dashboard</span>
         </a>
       </li>
+
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Utilisateurs">
+          <a class="nav-link" href="{{ path('users_index') }}">
+            <i class="fa fa-fw fa-users"></i>
+            <span class="nav-link-text">Utilisateurs</span>
+          </a>
+        </li>
       {% endif %}
 
       <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
@@ -244,10 +251,10 @@
           <span aria-hidden="true">×</span>
         </button>
       </div>
-      <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+
       <div class="modal-footer">
         <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-        <a class="btn btn-primary" href="{{ path('app_logout') }}">Logout</a>
+        <a class="btn btn-danger" href="{{ path('app_logout') }}">Me déconnecter</a>
       </div>
     </div>
   </div>

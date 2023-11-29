@@ -33,9 +33,11 @@ class Subject
 
     #[ORM\ManyToOne(inversedBy: 'subjects')]
     #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(onDelete:'CASCADE')]
     private ?User $owner_id = null;
 
     #[ORM\ManyToOne(inversedBy: 'talks')]
+    #[ORM\JoinColumn(onDelete:'CASCADE')]
     private ?User $speacker_id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -45,6 +47,7 @@ class Subject
     private ?string $status = null;
 
     #[ORM\ManyToOne]
+    #[ORM\JoinColumn(onDelete:'CASCADE')]
     private ?User $updated_by = null;
 
     #[ORM\Column]
@@ -54,6 +57,7 @@ class Subject
     private ?\DateTimeImmutable $updated_at = null;
 
     #[ORM\ManyToOne(inversedBy: 'subjects')]
+    #[ORM\JoinColumn(onDelete:'CASCADE')]
     private ?Events $events = null;
 
     #[ORM\OneToMany(mappedBy: 'subject', targetEntity: SubjectLike::class)]

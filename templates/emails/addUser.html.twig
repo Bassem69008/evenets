@@ -1,0 +1,8 @@
+<h1>Vous avez était ajouté !</h1>
+<p>Bonjour {{ user.firstname }},</p>
+<p>Un autilisateur vous a ajouté dans notre plateforme de meeting By Niji! </p>
+<p>Vous trouvez trouvez ci dessous vous coordonnées de connexion: </p>
+<p>Email: {{ user.email }}</p>
+<p>Mot de passe : {{ password }}</p>
+
+<p><a href="{{ absolute_url(path('app_login')) }}">Connectez vous</a></p>

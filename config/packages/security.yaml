@@ -14,15 +14,10 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        secured_area:
-            pattern: ^/
-            provider: app_user_provider
-            custom_authenticator: App\Security\UserAuthenticator
-            logout:
-                path: app_logout
-                target: /connexion
+
         main:
             lazy: true
+
             provider: app_user_provider
             custom_authenticator: App\Security\UserAuthenticator
             logout:
@@ -50,7 +45,9 @@ security:
     access_control:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
+          - { path: ^/$, roles: IS_AUTHENTICATED_FULLY }
           - { path: ^/dashboard, roles: [ROLE_BOARD, ROLE_ADMIN] }
+
 
 
 when@test:

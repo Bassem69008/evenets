@@ -7,7 +7,7 @@
     <h2>Liste des utilisateurs </h2>
 
     <div class="d-flex justify-content-between">
-    <a href="#" type="button" class="btn btn-primary my-3  " >Ajouter un utilisateur</a>
+    <a href="{{ path('users_create') }}" type="button" class="btn btn-primary my-3  " >Ajouter un utilisateur</a>
     <a href="#" type="button" class="btn btn-info my-3  " >Télécharger un fichier</a>
 
     </div>
@@ -31,16 +31,16 @@
             {% for user in users %}
                 {% set count = count +1 %}
                 <tr>
-                    <td>{{ count }}</td>
+                    <td>{{ user.id }}</td>
                     <td>{{ user.email }}</td>
                     <td>{{ user.lastname }}</td>
                     <td>{{ user.firstname }}</td>
-                    <td> {{user.roles|join(', ')}} </td>
+                    <td> {{user.roles[0]}} </td>
                     <td>
                         <th>
-                <td><a href="#" type="button" class="btn btn-warning">EDIT</a></td>
-                <td><a href="#" type="button" class="btn btn-info">Afficher</a></td>
-                <td><a href="#" type="button" class="btn btn-danger"> Supprimer</a></td>
+                <td><a href="{{ path('users_edit', {id: user.id}) }}" type="button" class="btn btn-warning">EDIT</a></td>
+                <td><a href="{{path('users_show', {id:user.id}) }}" type="button" class="btn btn-info">Afficher</a></td>
+                <td><a href="#"  data-toggle="modal" type="button" class="btn btn-danger" data-target="#ModalDeleteUser" data-parametre={{ user.id }}> Supprimer</a></td>
             </th>
                     </td>
                 </tr>
@@ -49,5 +49,45 @@
             </table>
         </div>
     </div>
+
+    <!-- Logout Modal-->
+
+    <div class="modal fade" id="ModalDeleteUser" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Voulez-vous vraiment supprimer cet utulisateur </h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Cette action est irréversible</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="#" id="lienAvecParametre">Supprimer</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+{% block javascripts %}
+    <script>
+        $(document).ready(function() {
+            // Lorsque le modal est sur le point d'être affiché
+            $('#ModalDeleteUser').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget); // Bouton qui a déclenché le modal
+
+                // On récupère la valeur du paramètre
+                var parametre = button.data('parametre');
+                // On met à jour le lien avec le nouveau paramètre
+                var lien = "{{ path('users_delete', {'id': 'VALEUR_DU_PARAMETRE'  }) }}";
+                lien = lien.replace('VALEUR_DU_PARAMETRE', parametre);
+
+                // On met  à jour l'attribut href du lien dans le modal
+                $('#lienAvecParametre').attr('href', lien);
+            });
+
+        });
+    </script>
 {% endblock %}

@@ -1,0 +1,36 @@
+{%  extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-6 justify-content-center">
+              <div class="card">
+                  <div class="card-header">
+                      <fieldset>
+                          <h2>Informations</h2>
+                      </fieldset>
+                  </div>
+                  <div class="card-body">
+                      <div class="col">
+                          Nom: {{ user.lastname }}
+                      </div>
+                      <div class="col">
+                          Prénom: {{ user.firstname }}
+                      </div>
+                      <div class="col">
+                          Email: {{ user.email }}
+                      </div>
+
+                      <div class="col">
+                          Do: {{ user.do }}
+                      </div>
+                      <div class="col">
+                          Nom: {{ user.site }}
+                      </div>
+                  </div>
+
+              </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

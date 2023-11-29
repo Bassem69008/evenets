@@ -1,0 +1,33 @@
+{%  extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <h2>Modification d'un utilisateur</h2>
+                {{ form_errors(form) }}
+                {{ form_start(form) }}
+
+                <fieldset>
+                    <legend>Coordonnées</legend>
+                    {{ form_row(form.email) }}
+                    {{ form_row(form.lastname) }}
+                    {{ form_row(form.firstname) }}
+                </fieldset>
+
+
+
+                <fieldset class="mb-3">
+                    <legend>Situation </legend>
+                    {{ form_row(form.site) }}
+                    {{ form_row(form.do) }}
+                    {{ form_row(form.roles) }}
+                </fieldset>
+
+
+                <button type="submit"  class="btn-primary  btn my-3 btn-lg" >Enregistrer </button>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}
