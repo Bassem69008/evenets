@@ -4,10 +4,9 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col">
-                <h2>Inscription</h2>
+                <h1>Ajout d'un utilisateur</h1>
                 {{ form_errors(form) }}
                 {{ form_start(form) }}
-                <h1>Ajout d'un utilisateur</h1>
                 <fieldset>
                     <legend>Coordonnées</legend>
                     {{ form_row(form.email) }}
@@ -25,7 +24,8 @@
                 </fieldset>
 
 
-                <button type="submit"  class="btn-primary  btn my-3 btn-lg" >Enregistrer </button>
+                <a  type ="button" href="{{ path('users_index') }}" class="btn my-3 btn-lg btn-info ">retour</a>
+                <button type="submit"  class="btn-primary  btn my-3 btn-lg" >enregistrer </button>
                 {{ form_end(form) }}
             </div>
         </div>
