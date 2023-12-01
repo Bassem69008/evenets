@@ -3,75 +3,98 @@
 {% block title %}Liste des Utilisateurs{% endblock %}
 
 {% block body %}
-<div class="container-fluid" >
-    <h2>Liste des utilisateurs</h2>
+    <div class="container-fluid">
+        <h2>Liste des utilisateurs</h2>
 
-    <div class="d-flex justify-content-between">
-    <a href="{{ path('users_create') }}" type="button" class="btn btn-primary my-3  " >Ajouter un utilisateur</a>
-    <a href="#" type="button" class="btn btn-info my-3  " >Télécharger un fichier</a>
-
-    </div>
-
-    <div class="col-lg-12 mt-3">
-        <div class="table-responsive">
-            <table class="table table-hover text-nowrap">
-                <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Nom</th>
-                    <th scope="col">Prénom</th>
-                    <th scope="col">Roles</th>
-                    <th scope="col">EDITION</th>
-                </tr>
-                </thead>
-            <tbody>
-
-            {% set count = 0 %}
-            {% for user in users %}
-                {% set count = count +1 %}
-                <tr>
-                    <td>{{ user.id }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.lastname }}</td>
-                    <td>{{ user.firstname }}</td>
-                    <td> {{user.roles[0]}} </td>
-                    <td>
-                        <th>
-                <td><a href="{{ path('users_edit', {id: user.id}) }}" type="button" class="btn btn-warning">EDIT</a></td>
-                <td><a href="{{path('users_show', {id:user.id}) }}" type="button" class="btn btn-info">Afficher</a></td>
-                <td><a href="#"  data-toggle="modal" type="button" class="btn btn-danger" data-target="#ModalDeleteUser" data-parametre={{ user.id }}> Supprimer</a></td>
-            </th>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-            </table>
+        <div class="d-flex justify-content-between">
+            <a href="{{ path('users_create') }}" type="button" class="btn btn-primary my-3">Ajouter un utilisateur</a>
+            <!--<a href="#" data-toggle="modal" id="openModalUpload" type="button" class="btn btn-info my-3" data-target="#ModalUploadFile">Télécharger un fichier</a> -->
+            <a href="{{ path('users_upload') }}"  id="openUpload" type="button" class="btn btn-info my-3" >Télécharger un fichier</a>
         </div>
-    </div>
 
-    <!-- Logout Modal-->
+        <div class="col-lg-12 mt-3">
+            <div class="table-responsive">
+                <table class="table table-hover text-nowrap">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Nom</th>
+                        <th scope="col">Prénom</th>
+                        <th scope="col">Roles</th>
+                        <th scope="col">EDITION</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% set count = 0 %}
+                    {% for user in users %}
+                        {% set count = count + 1 %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.lastname }}</td>
+                            <td>{{ user.firstname }}</td>
+                            <td>{{ user.roles[0] }}</td>
+                            <td>
+                            <td>
+                                <a href="{{ path('users_edit', {id: user.id}) }}" type="button" class="btn btn-warning">EDIT</a>
+                                <a href="{{ path('users_show', {id:user.id}) }}" type="button" class="btn btn-info">Afficher</a>
+                                <a href="#" data-toggle="modal" type="button" class="btn btn-danger" data-target="#ModalDeleteUser" data-parametre={{ user.id }}> Supprimer</a>
+                            </td>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-    <div class="modal fade" id="ModalDeleteUser" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Voulez-vous vraiment supprimer cet utulisateur </h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Cette action est irréversible</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="#" id="lienAvecParametre">Supprimer</a>
+        <!-- Logout Modal-->
+        <div class="modal fade" id="ModalDeleteUser" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Voulez-vous vraiment supprimer cet utilisateur </h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">Cette action est irréversible</div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        <a class="btn btn-primary" href="#" id="lienAvecParametre">Supprimer</a>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- MODAL UPLOAD FILE -->
+        <div class="modal fade" id="ModalUploadFile" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Veuillez Sélectionner Votre fichier </h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="uploadModalBody">
+                        <!-- Le contenu du formulaire sera injecté ici après l'appel Ajax -->
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        <a  type="submit" class="btn btn-primary" href="{{ path('users_upload') }}" id="submitUploadForm">Enregistrer </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END MODAL UPLOAD FILE -->
+
     </div>
-</div>
 {% endblock %}
+
 {% block javascripts %}
+
     <script>
         $(document).ready(function() {
             // Lorsque le modal est sur le point d'être affiché
@@ -87,7 +110,33 @@
                 // On met  à jour l'attribut href du lien dans le modal
                 $('#lienAvecParametre').attr('href', lien);
             });
+        });
 
+        document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('openModalUpload').addEventListener('click', function() {
+            // Utilisez ici une bibliothèque JavaScript comme Axios ou fetch pour effectuer une requête AJAX
+
+            // Exemple avec Axios
+            axios.get('/admin/users/upload')
+                .then(function(response) {
+
+                    // Injectez la réponse dans le corps du modal
+                    document.getElementById('uploadModalBody').innerHTML = response.data;
+
+                    // Affichez le modal
+                    $('#ModalUploadFile').modal('show');
+                })
+                .catch(function(error) {
+                    console.log(error.response);
+                });
+        });
+
+        // Écouteur d'événement pour le clic sur le bouton Enregistrer du formulaire d'upload
+        document.getElementById('submitUploadForm').addEventListener('click', function() {
+            axios.get('/admin/users/upload/manage')
+            // Ajoutez ici le code pour traiter le clic sur le bouton Enregistrer
+        });
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js" ></script>
 {% endblock %}

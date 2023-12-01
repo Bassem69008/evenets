@@ -5,6 +5,7 @@ html {
 
 body {
     overflow-x: hidden;
+    background: #72777a !important;
     /*background-color: #fbfbfb !important; */
 }
 ul a{

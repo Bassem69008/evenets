@@ -3,19 +3,17 @@
 namespace App\Controller\Admin;
 
 use App\Entity\User;
+use App\Form\UploadFileType;
 use App\Form\UserCreateType;
 use App\Repository\UserRepository;
 use App\Service\SendMailService;
 use App\Service\UserService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use function compact;
-use function dd;
-use function json_decode;
 
 #[Route('/admin/users', name:'users_', methods: ['get'])]
 class UsersController extends AbstractController
@@ -26,9 +24,9 @@ class UsersController extends AbstractController
 
     }
     #[Route('/', name: 'index')]
-    public function index(UserRepository $userRepository): Response
+    public function index(Request $request): Response
     {
-        $users = $userRepository->findAll();
+        $users = $this->userRepository->findAll();
 
         return $this->render('admin/users/index.html.twig', [
             'users' => $users
@@ -40,6 +38,7 @@ class UsersController extends AbstractController
     public function add(Request $request)
 
     {
+
         $user = new User();
         // on crée le mot de passe etv on le set
         $password = $this->userService->createPassword();
@@ -70,10 +69,12 @@ class UsersController extends AbstractController
             return $this->redirectToRoute('users_index');
         }
 
+
         return $this->render('admin/users/add.html.twig',
         [
             'form'=>$form->createView(),
             'user'=>$user
+
         ]);
     }
 
@@ -84,11 +85,10 @@ class UsersController extends AbstractController
        {
            return $this->render('errors/404.html.twig');
        }
-       dd($user);
        return $this->render('admin/users/show.html.twig',compact('user'));
     }
 
-    #[Route('/{id}/edit', name:'edit')]
+    #[Route('/{id}/edit', name:'edit',methods: ['post'])]
     public function edit(User $user=null, Request $request)
     {
         if(!$user)
@@ -101,9 +101,6 @@ class UsersController extends AbstractController
 
         if($form->isSubmitted() && $form->isValid())
         {
-
-
-            // on enregistre les données
 
             $this->userRepository->save($user);
             // on redirige vers la page des utilisateurs
@@ -126,9 +123,31 @@ class UsersController extends AbstractController
         return $this->redirectToRoute('users_index');
     }
 
-    #[Route('/upload', name:'upload')]
-    public function upload()
+
+    #[Route('/upload', name:'upload', methods: ['post'])]
+    public function upload(Request $request)
     {
+        $form = $this->createForm(UploadFileType::class);
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid() )
+        {
+            $uploadedFile=$form->get('file')->getData();
+            if ($uploadedFile) {
+                $this->userService->processFile($uploadedFile);
+
+            }
+
+            return  $this->redirectToRoute('users_index');
+        }
+
+
+        return $this->render('upload/upload.html.twig',[
+
+            'form'=>$form->createView(),
+
+        ]);
 
     }
+
 }
