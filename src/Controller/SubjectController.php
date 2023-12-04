@@ -3,8 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Subject;
+use App\Entity\SubjectLike;
 use App\Form\CreateSubjectType;
+use App\Repository\SubjectLikeRepository;
 use App\Repository\SubjectRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -98,5 +101,59 @@ class SubjectController extends AbstractController
         $this->subjectRepository->remove($subject);
 
         return $this->redirectToRoute('subjects_index');
+    }
+
+    /**
+     * @param Subject $subject
+     * @param EntityManagerInterface $manager
+     * @param SubjectLikeRepository $likeRepo
+     * @return Response
+     * Liker ou Unliker un sujet
+     */
+    #[Route('/{id}/like', name:'like', methods: ['get'])]
+    public function like(Subject $subject, EntityManagerInterface $manager, SubjectLikeRepository $likeRepo): Response
+    {
+        // l'utilisateur n'est pas connecté
+       $user= $this->getUser();
+
+     if ($this->isGranted('ROLE_ADMIN')) {
+            return $this->json([
+                'code'=>403 ,
+                'message'=> 'unauthorized'
+            ],403);
+        }
+      /*  if(!$user)
+        {
+            return $this->json([
+               'code'=>403 ,
+                'message'=> 'unauthorized'
+            ],403);
+        } */
+
+        // le user est connecté est connecté et aime le sujet =>supprimer le like
+        if($subject->isLikedByUser($user)){
+            $like= $likeRepo->findOneBy(['subject'=>$subject, 'user'=>$user]);
+            $manager->remove($like);
+            $manager->flush();
+
+            return $this->json([
+                'code'=>200 ,
+                'message'=> 'like supprimé',
+                'likes'=>$likeRepo->count(['subject'=>$subject])
+            ],200);
+        }
+        $like = new SubjectLike();
+        $like->setSubject($subject);
+        $like->setUser($user);
+
+        $manager->persist($like);
+        $manager->flush();
+
+        // le user est connecté n'aime âs le sujet => ajouter un like
+        return $this->json([
+            'code'=>200 ,
+            'message'=> 'like ajouté',
+            'likes'=>$likeRepo->count(['subject'=>$subject])
+        ],200);
     }
 }

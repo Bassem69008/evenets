@@ -18,7 +18,7 @@ class SubjectFixtures extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         $faker = Factory::create('fr_FR');
-        for ($sbj = 1; $sbj <= 15; ++$sbj) {
+        for ($sbj = 1; $sbj <= 50; ++$sbj) {
             $subject = new Subject();
             $subject->setTitle($faker->text(55));
             $subject->setSlug($this->slugger->slug($subject->getTitle())->lower());
@@ -29,6 +29,7 @@ class SubjectFixtures extends Fixture implements DependentFixtureInterface
             $subject->setStatus($faker->randomElement(['draft', 'viewed', 'published', 'rejected']));
             $owner = $this->getReference('usr-'.\rand(1, 15));
             $subject->setOwnerId($owner);
+            $this->setReference('sbj-'.$sbj, $subject);
 
             $manager->persist($subject);
         }

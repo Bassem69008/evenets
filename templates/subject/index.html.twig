@@ -14,15 +14,23 @@
                 <div class="card-body">
                     <div class="subject-title">
                         <h3 class="text-primary">{{ subject.title}} </h3>
-                        <div>
-                            <i class="fa fa-heart  text-danger" style="position:absolute;top:7px; right:9px;font-size:22px;" ></i><br>
-                            <span style="font-size:10px;position:absolute;top:27px; right:14px;">12</span>
-                        </div>
+                        <a href="{{ path('subjects_like',{id:subject.id}) }}" class="btn btn-link js-like" id="js-like">
+                            {% if app.user and subject.isLikedByUser(app.user) %}
+                                <i class="fa fa-heart  text-danger" style="position:absolute;top:7px; right:9px;font-size:22px;" >
+                                    <span class="js-label"> Je n'aime plus</span>
+                                </i>  <br>
+                            {% else %}
+                                <i class="fa fa-heart-o text-danger " style="position:absolute;top:7px; right:9px;font-size:22px;border-color: red;" >
+                                    <span class="js-label"> J'aime</span></i>
+                                <br>
+                            {% endif %}
+
+                            <span class="js-likes text-muted" style="font-size:10px;position:absolute;top:27px; right:76px;">{{ subject.likes|length }}</span>
+                        </a>
                     </div>
                     <p>
                      {{ subject.description |raw(20) }}
                     </p>
-
                     <a href="{{ path('subjects_show',{slug:subject.slug}) }}" class="position-absolute text-info" style="bottom:7px;right:9px;text-decoration:none!important;">
                         En savoir plus
                         <i class=" fa fa-arrow-right"></i>
@@ -34,4 +42,9 @@
     {% endfor %}
 
 </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('assets/js/ajaxLike.js') }}"></script>
+
 {% endblock %}

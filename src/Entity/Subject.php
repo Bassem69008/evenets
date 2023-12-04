@@ -209,4 +209,21 @@ class Subject
 
         return $this;
     }
+
+    /**
+     * @param User $user
+     * @return bool
+     * savoir si le sujet est liké par un user
+     */
+    public function isLikedByUser(User $user): bool
+    {
+        foreach ($this->likes as $like)
+        {
+           if($like->getUser() === $user)
+           {
+               return true;
+           }
+        }
+        return false;
+    }
 }
