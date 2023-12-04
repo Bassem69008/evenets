@@ -7,6 +7,7 @@ use App\Entity\SubjectLike;
 use App\Form\CreateSubjectType;
 use App\Repository\SubjectLikeRepository;
 use App\Repository\SubjectRepository;
+use App\Service\PaginatorService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,17 +18,18 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 #[Route('/sujets', name: 'subjects_')]
 class SubjectController extends AbstractController
 {
-    public function __construct(private SubjectRepository $subjectRepository, private SluggerInterface $slugger)
+    public function __construct(private SubjectRepository $subjectRepository, private SluggerInterface $slugger, private PaginatorService $paginator)
     {
     }
 
     #[Route('/', name: 'index')]
-    public function index(): Response
+    public function index(Request $request): Response
     {
         $subjects = $this->subjectRepository->findAll();
 
         return $this->render('subject/index.html.twig', [
-            'subjects' => $subjects,
+            'pagination'=>$this->paginator->paginate($subjects,$request),
+
         ]);
     }
 
@@ -116,19 +118,13 @@ class SubjectController extends AbstractController
         // l'utilisateur n'est pas connecté
        $user= $this->getUser();
 
-     if ($this->isGranted('ROLE_ADMIN')) {
+     if ($this->isGranted('ROLE_ADMIN') || !$user) {
             return $this->json([
                 'code'=>403 ,
                 'message'=> 'unauthorized'
             ],403);
         }
-      /*  if(!$user)
-        {
-            return $this->json([
-               'code'=>403 ,
-                'message'=> 'unauthorized'
-            ],403);
-        } */
+
 
         // le user est connecté est connecté et aime le sujet =>supprimer le like
         if($subject->isLikedByUser($user)){

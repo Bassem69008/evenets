@@ -85,7 +85,9 @@ class UserService
     public function removeUsers(): void
     {
         $users = $this->userRepository->getUserByRoles();
+
         foreach ($users as $user) {
+
             $this->userRepository->remove($user);
         }
     }
