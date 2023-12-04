@@ -13,7 +13,8 @@
           <span class="nav-link-text">Dashboard</span>
         </a>
       </li>
-
+      {% endif %}
+      {% if is_granted("ROLE_ADMIN")  %}
         <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Utilisateurs">
           <a class="nav-link" href="{{ path('users_index') }}">
             <i class="fa fa-fw fa-users"></i>
@@ -21,6 +22,13 @@
           </a>
         </li>
       {% endif %}
+
+      <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Utilisateurs">
+        <a class="nav-link" href="{{ path('subjects_index') }}">
+          <i class="fa fa-fw fa-users"></i>
+          <span class="nav-link-text">Sujets</span>
+        </a>
+      </li>
 
       <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
         <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseEvents" data-parent="#exampleAccordion">
@@ -37,10 +45,11 @@
         </ul>
       </li>
 
+
       <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
         <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseSubjects" data-parent="#exampleAccordion">
           <i class="fa fa-fw fa-wrench"></i>
-          <span class="nav-link-text">Sujets</span>
+          <span class="nav-link-text">Mon Compte</span>
         </a>
         <ul class="sidenav-second-level collapse" id="collapseSubjects">
           <li>

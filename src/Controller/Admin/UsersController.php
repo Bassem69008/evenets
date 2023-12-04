@@ -6,8 +6,10 @@ use App\Entity\User;
 use App\Form\UploadFileType;
 use App\Form\UserCreateType;
 use App\Repository\UserRepository;
+use App\Service\PaginatorService;
 use App\Service\SendMailService;
 use App\Service\UserService;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +21,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class UsersController extends AbstractController
 {
-    public function __construct(private UserService $userService, private UserRepository $userRepository, private UserPasswordHasherInterface $encoder, private SendMailService $mail)
+    public function __construct(
+        private UserService $userService, private UserRepository $userRepository,
+        private UserPasswordHasherInterface $encoder, private SendMailService $mail,
+        private PaginatorService $paginator
+    )
     {
     }
 
@@ -32,11 +38,11 @@ class UsersController extends AbstractController
         $users = $this->userRepository->findAll();
 
         return $this->render('admin/users/index.html.twig', [
-            'users' => $users,
+            'pagination' => $this->paginator->paginate($this->userRepository->findAll(),$request)
         ]);
     }
 
-    #[Route('/creation', name: 'create', methods: ['post'])]
+    #[Route('/creation', name: 'create')]
     public function add(Request $request)
     {
         $user = new User();
@@ -84,7 +90,7 @@ class UsersController extends AbstractController
         return $this->render('admin/users/show.html.twig', \compact('user'));
     }
 
-    #[Route('/{id}/edit', name: 'edit', methods: ['post'])]
+    #[Route('/{id}/edit', name: 'edit')]
     public function edit(User $user = null, Request $request)
     {
         if (!$user) {
@@ -118,7 +124,7 @@ class UsersController extends AbstractController
         return $this->redirectToRoute('users_index');
     }
 
-    #[Route('/upload', name: 'upload', methods: ['post'])]
+    #[Route('/upload', name: 'upload')]
     public function upload(Request $request)
     {
         $form = $this->createForm(UploadFileType::class);

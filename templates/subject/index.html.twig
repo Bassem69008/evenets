@@ -5,8 +5,12 @@
 {% block body %}
 <div class="container-fluid">
     <h1 class="mt-5 pt-3">Liste des sujets </h1>
+    {% if not is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('subjects_create') }}" type="button" class="btn btn-success my-3">Créer Un sujet</a>
+    {% endif %}
 
-    {% for subject in subjects %}
+
+    {% for subject in pagination %}
         <div class="row ">
         <div class="col bg-white mt-3 card-subject " style="border-radius:10px;">
             <div class="card bg-white border-0">
@@ -14,6 +18,7 @@
                 <div class="card-body">
                     <div class="subject-title">
                         <h3 class="text-primary">{{ subject.title}} </h3>
+                        {% if not is_granted('ROLE_ADMIN') %}
                         <a href="{{ path('subjects_like',{id:subject.id}) }}" class="btn btn-link js-like" id="js-like">
                             {% if app.user and subject.isLikedByUser(app.user) %}
                                 <i class="fa fa-heart  text-danger" style="position:absolute;top:7px; right:9px;font-size:22px;" >
@@ -27,6 +32,7 @@
 
                             <span class="js-likes text-muted" style="font-size:10px;position:absolute;top:27px; right:76px;">{{ subject.likes|length }}</span>
                         </a>
+                        {% endif %}
                     </div>
                     <p>
                      {{ subject.description |raw(20) }}
@@ -40,6 +46,10 @@
         </div>
     </div>
     {% endfor %}
+    <div class="pagination my-3">
+        {{ knp_pagination_render(pagination, '/pagination/bootstrap_pagination.html.twig') }}
+    </div>
+
 
 </div>
 {% endblock %}
