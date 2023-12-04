@@ -33,35 +33,32 @@ class Subject
 
     #[ORM\ManyToOne(inversedBy: 'subjects')]
     #[ORM\JoinColumn(nullable: false)]
-    #[ORM\JoinColumn(onDelete:'CASCADE')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?User $owner_id = null;
 
     #[ORM\ManyToOne(inversedBy: 'talks')]
-    #[ORM\JoinColumn(onDelete:'CASCADE')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?User $speacker_id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $duration = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $status = null;
+    private ?string $status = 'draft';
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(onDelete:'CASCADE')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?User $updated_by = null;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
-
-    #[ORM\Column]
-    private ?\DateTimeImmutable $updated_at = null;
-
     #[ORM\ManyToOne(inversedBy: 'subjects')]
-    #[ORM\JoinColumn(onDelete:'CASCADE')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Events $events = null;
 
     #[ORM\OneToMany(mappedBy: 'subject', targetEntity: SubjectLike::class)]
     private Collection $likes;
+
+    #[ORM\Column]
+    private ?bool $is_presented = false;
 
     public function __construct()
     {
@@ -159,18 +156,6 @@ class Subject
         return $this;
     }
 
-    public function getUpdatedBy(): ?User
-    {
-        return $this->updated_by;
-    }
-
-    public function setUpdatedBy(?User $updated_by): static
-    {
-        $this->updated_by = $updated_by;
-
-        return $this;
-    }
-
     public function getEvents(): ?Events
     {
         return $this->events;
@@ -209,6 +194,18 @@ class Subject
                 $like->setSubject(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isIsPresented(): ?bool
+    {
+        return $this->is_presented;
+    }
+
+    public function setIsPresented(bool $is_presented): static
+    {
+        $this->is_presented = $is_presented;
 
         return $this;
     }

@@ -1,0 +1,87 @@
+{% extends 'base.html.twig' %}
+
+{% block title %} {{subject.title }} {% endblock %}
+
+{% block body %}
+<div class="container">
+
+    <div class="row">
+        <div class="col bg-white mt-3 " style="border-radius:10px;">
+            <div class="card bg-white border-0">
+
+                <div class="card-body">
+                    <div class="subject-title">
+                        <h3 class="text-primary">{{ subject.title}} </h3>
+                        <p>Proposé par: {{ subject.ownerId.lastname }} {{ subject.ownerId.firstname }} le {{ subject.createdAt|date("d-m-Y") }}</p>
+                        <div>
+                            <i class="fa fa-heart  text-danger" style="position:absolute;top:7px; right:9px;font-size:22px;" ></i><br>
+                            <span style="font-size:10px;position:absolute;top:27px; right:14px;">12</span>
+                        </div>
+                    </div>
+                    <p>
+                     {{ subject.description |raw }}
+                    </p>
+                    <div class="d-flex ">
+                        {% if app.user %}
+                        <a href="{{ path('subjects_edit', {slug: subject.slug}) }}" class="btn btn-warning mr-2">
+                           Modifier
+
+                            <a href="#" data-toggle="modal" type="button" class="btn btn-danger mr-2" data-target="#ModalDeleteSubject" data-parametre={{ subject.id }}> Supprimer</a>
+
+                        {% endif %}
+                        {% if is_granted("ROLE_BOARD") %}
+                        <a href="#" class="btn btn-danger mr-2">
+                            Rejeter
+                        </a>
+                        <a href="#" class="btn btn-success mr-2">
+                            Valider
+                        </a>
+                        {% endif %}
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- DELETE SUBJECT Modal-->
+    <div class="modal fade" id="ModalDeleteSubject" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Voulez-vous vraiment supprimer ce sujet  </h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Cette action est irréversible</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="#" id="lienAvecParametre">Supprimer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+
+        $(document).ready(function() {
+            // Lorsque le modal est sur le point d'être affiché
+            $('#ModalDeleteSubject').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget); // Bouton qui a déclenché le modal
+
+                // On récupère la valeur du paramètre
+                var parametre = button.data('parametre');
+                // On met à jour le lien avec le nouveau paramètre
+                var lien = "{{ path('subjects_delete', {'id': 'VALEUR_DU_PARAMETRE'  }) }}";
+                lien = lien.replace('VALEUR_DU_PARAMETRE', parametre);
+
+                // On met  à jour l'attribut href du lien dans le modal
+                $('#lienAvecParametre').attr('href', lien);
+            });
+        }});
+    </script>
+{% endblock %}

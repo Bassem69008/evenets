@@ -13,45 +13,43 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use function compact;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/admin/users', name:'users_', methods: ['get'])]
+#[Route('/admin/users', name: 'users_')]
+#[IsGranted('ROLE_ADMIN')]
 class UsersController extends AbstractController
 {
-
     public function __construct(private UserService $userService, private UserRepository $userRepository, private UserPasswordHasherInterface $encoder, private SendMailService $mail)
     {
-
     }
+
     #[Route('/', name: 'index')]
     public function index(Request $request): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->render('errors/403.html.twig');
+        }
         $users = $this->userRepository->findAll();
 
         return $this->render('admin/users/index.html.twig', [
-            'users' => $users
+            'users' => $users,
         ]);
     }
 
-
-    #[Route('/creation', name: 'create', methods: ['post'] )]
+    #[Route('/creation', name: 'create', methods: ['post'])]
     public function add(Request $request)
-
     {
-
         $user = new User();
         // on crée le mot de passe etv on le set
         $password = $this->userService->createPassword();
-        $user->setPassword($this->encoder->hashPassword($user,$password));
+        $user->setPassword($this->encoder->hashPassword($user, $password));
 
         // on crée le formulaire
-        $form = $this->createForm(UserCreateType::class,$user);
+        $form = $this->createForm(UserCreateType::class, $user);
         $form->handleRequest($request);
 
         // on traite le formulaire
-        if($form->isSubmitted() && $form->isValid())
-        {
-
+        if ($form->isSubmitted() && $form->isValid()) {
             $this->userRepository->save($user);
             // envoi de mail pour l'utilisateur
             $this->mail->send(
@@ -60,8 +58,8 @@ class UsersController extends AbstractController
                 'Ajout de votre compte',
                 'addUser',
                 [
-                    'user' =>$user,
-                    'password'=> $password
+                    'user' => $user,
+                    'password' => $password,
                 ]
             );
 
@@ -69,85 +67,74 @@ class UsersController extends AbstractController
             return $this->redirectToRoute('users_index');
         }
 
-
         return $this->render('admin/users/add.html.twig',
-        [
-            'form'=>$form->createView(),
-            'user'=>$user
-
-        ]);
+            [
+                'form' => $form->createView(),
+                'user' => $user,
+            ]);
     }
 
-   #[Route('/{id}/show', name:'show', methods: ['get'])]
-    public function show(User $user =null): Response
+    #[Route('/{id}/show', name: 'show', methods: ['get'])]
+    public function show(User $user = null): Response
     {
-       if(!$user)
-       {
-           return $this->render('errors/404.html.twig');
-       }
-       return $this->render('admin/users/show.html.twig',compact('user'));
-    }
-
-    #[Route('/{id}/edit', name:'edit',methods: ['post'])]
-    public function edit(User $user=null, Request $request)
-    {
-        if(!$user)
-        {
+        if (!$user) {
             return $this->render('errors/404.html.twig');
         }
 
-        $form = $this->createForm(UserCreateType::class,$user);
+        return $this->render('admin/users/show.html.twig', \compact('user'));
+    }
+
+    #[Route('/{id}/edit', name: 'edit', methods: ['post'])]
+    public function edit(User $user = null, Request $request)
+    {
+        if (!$user) {
+            return $this->render('errors/404.html.twig');
+        }
+
+        $form = $this->createForm(UserCreateType::class, $user);
         $form->handleRequest($request);
 
-        if($form->isSubmitted() && $form->isValid())
-        {
-
+        if ($form->isSubmitted() && $form->isValid()) {
             $this->userRepository->save($user);
+
             // on redirige vers la page des utilisateurs
             return $this->redirectToRoute('users_index');
         }
 
-        return $this->render('admin/users/edit.html.twig',[
-            'user' =>$user,
-            'form' =>$form->createView()
+        return $this->render('admin/users/edit.html.twig', [
+            'user' => $user,
+            'form' => $form->createView(),
         ]);
     }
-   #[Route('/{id}/delete', name:'delete', methods: ['get'])]
-    public function delete(User $user=null, Request $request)
+
+    #[Route('/{id}/delete', name: 'delete', methods: ['get'])]
+    public function delete(User $user = null, Request $request)
     {
-        if(!$user)
-        {
+        if (!$user) {
             return $this->render('errors/404.html.twig');
         }
         $this->userRepository->remove($user);
+
         return $this->redirectToRoute('users_index');
     }
 
-
-    #[Route('/upload', name:'upload', methods: ['post'])]
+    #[Route('/upload', name: 'upload', methods: ['post'])]
     public function upload(Request $request)
     {
         $form = $this->createForm(UploadFileType::class);
         $form->handleRequest($request);
 
-        if($form->isSubmitted() && $form->isValid() )
-        {
-            $uploadedFile=$form->get('file')->getData();
+        if ($form->isSubmitted() && $form->isValid()) {
+            $uploadedFile = $form->get('file')->getData();
             if ($uploadedFile) {
                 $this->userService->processFile($uploadedFile);
-
             }
 
-            return  $this->redirectToRoute('users_index');
+            return $this->redirectToRoute('users_index');
         }
 
-
-        return $this->render('upload/upload.html.twig',[
-
-            'form'=>$form->createView(),
-
+        return $this->render('upload/upload.html.twig', [
+            'form' => $form->createView(),
         ]);
-
     }
-
 }

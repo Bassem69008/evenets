@@ -4,62 +4,61 @@ namespace App\Form;
 
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\CallbackTransformer;
-
 
 class UserCreateType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email', EmailType::class,[
-                'attr'=>[
-                    'class'=>'form-control'
+            ->add('email', EmailType::class, [
+                'attr' => [
+                    'class' => 'form-control',
                 ],
-                'label'=> 'Email'
+                'label' => 'Email',
             ])
 
-            ->add('roles', ChoiceType::class,[
-                'choices'=>[
-                    'Admin'=>'ROLE_ADMIN',
+            ->add('roles', ChoiceType::class, [
+                'choices' => [
+                    'Admin' => 'ROLE_ADMIN',
                     'Board' => 'ROLE_BOARD',
-                    'Utilisateur' =>'ROLE_USER'
+                    'Utilisateur' => 'ROLE_USER',
                 ],
-                "attr"=>['class'=>'form-control'],
-                "label" =>"Role"
+                'attr' => ['class' => 'form-control'],
+                'label' => 'Role',
             ])
             ->add('lastname', TextType::class, [
                 'attr' => ['class' => 'form-control'],
-                'label' => 'Nom'
+                'label' => 'Nom',
             ])
-            ->add('firstname', TextType::class,[
-                'attr'=>[
-                    'class'=>'form-control'
+            ->add('firstname', TextType::class, [
+                'attr' => [
+                    'class' => 'form-control',
                 ],
-                'label'=> 'Prénom'
+                'label' => 'Prénom',
             ])
-            ->add('do',TextType::class,[
-        'attr'=>[
-            'class'=>'form-control'
+            ->add('do', TextType::class, [
+        'attr' => [
+            'class' => 'form-control',
         ],
-        'label'=> 'Do'
+        'label' => 'Do',
     ])
-            ->add('site', TextType::class,[
-                'attr'=>[
-                    'class'=>'form-control'
+            ->add('site', TextType::class, [
+                'attr' => [
+                    'class' => 'form-control',
                 ],
-                'label'=> 'Site'
+                'label' => 'Site',
             ])
 
         ;
         $builder->get('roles')
             ->addModelTransformer(new CallbackTransformer(
-                fn ($rolesAsArray) => count($rolesAsArray) ? $rolesAsArray[0]: null,
+                fn ($rolesAsArray) => count($rolesAsArray) ? $rolesAsArray[0] : null,
                 fn ($rolesAsString) => [$rolesAsString]
             ));
     }

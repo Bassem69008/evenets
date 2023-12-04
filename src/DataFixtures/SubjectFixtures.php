@@ -20,10 +20,11 @@ class SubjectFixtures extends Fixture implements DependentFixtureInterface
         $faker = Factory::create('fr_FR');
         for ($sbj = 1; $sbj <= 15; ++$sbj) {
             $subject = new Subject();
-            $subject->setTitle($faker->title);
+            $subject->setTitle($faker->text(55));
             $subject->setSlug($this->slugger->slug($subject->getTitle())->lower());
-            $subject->setDescription($faker->text);
+            $subject->setDescription($faker->paragraph);
             $subject->setType($faker->randomElement(['Conférence', 'Atelier']));
+            $subject->setIsPresented($faker->randomElement([false, true]));
             $subject->setDuration($faker->randomElement(['Court: 15min', 'Moyen: 30min', 'Long: 45min']));
             $subject->setStatus($faker->randomElement(['draft', 'viewed', 'published', 'rejected']));
             $owner = $this->getReference('usr-'.\rand(1, 15));

@@ -1,0 +1,17 @@
+# Read the documentation: https://symfony.com/doc/current/bundles/FOSCKEditorBundle/index.html
+
+fos_ck_editor:
+  configs:
+    default:
+      toolbar:
+        - { name: 'styles', items: [ 'Format', 'Font', 'FontSize' ] }
+        - { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat' ] }
+        - { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Blockquote' ] }
+        - { name: 'links', items: [ 'Link', 'Unlink' ] }
+        - { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] }
+        - { name: 'document', items: [ 'Source' ] }
+        - { name: 'insert', items: [ 'Image', 'Table', 'HorizontalRule', 'SpecialChar' ] }
+        - { name: 'tools', items: [ 'Maximize' ] }
+      font_names: "Arial/Arial, Helvetica, sans-serif; Courier New/Courier New, Courier, monospace; Georgia/Georgia, serif; Times New Roman/Times New Roman, Times, serif; Verdana"
+      autoGrow_bottomSpace: 15
+

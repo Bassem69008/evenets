@@ -9,16 +9,15 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use CreatedAtTrait;
-    public const ROLE_ADMIN='ROLE_ADMIN';
-    public const ROLE_USER ='ROLE_USER';
-    public const ROLE_CONNECTED='ROLE_CNNECTED';
-    public const ROLE_BOARD='ROLE_BOARD';
+    public const ROLE_ADMIN = 'ROLE_ADMIN';
+    public const ROLE_USER = 'ROLE_USER';
+    public const ROLE_CONNECTED = 'ROLE_CNNECTED';
+    public const ROLE_BOARD = 'ROLE_BOARD';
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -112,11 +111,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-         $roles=$this->roles;
+        $roles = $this->roles;
         // guarantee every user at least has ROLE_USER
-         $roles[] = 'ROLE_CONNECTED';
+        $roles[] = 'ROLE_CONNECTED';
 
-         return array_unique($roles);
+        return array_unique($roles);
     }
 
     public function setRoles(array $roles): self
@@ -359,6 +358,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
-
 }

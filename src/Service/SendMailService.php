@@ -1,14 +1,12 @@
 <?php
+
 namespace App\Service;
 
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 
-
 class SendMailService
 {
-
-
     public function __construct(private MailerInterface $mailer)
     {
     }
@@ -19,9 +17,7 @@ class SendMailService
         string $subject,
         string $template,
         array $context
-    ): void
-    {
-
+    ): void {
         // on crée le mail
         $email = (new TemplatedEmail())
             ->from($from)
@@ -33,6 +29,5 @@ class SendMailService
         // on envoi le mail
 
         $this->mailer->send($email);
-
     }
 }

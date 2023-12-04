@@ -36,11 +36,11 @@ class Events
 
     #[ORM\ManyToOne(inversedBy: 'events_created')]
     #[ORM\JoinColumn(nullable: false)]
-    #[ORM\JoinColumn(onDelete:'CASCADE')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?User $created_by = null;
 
     #[ORM\ManyToOne(inversedBy: 'events_updated')]
-    #[ORM\JoinColumn(onDelete:'CASCADE')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?User $updated_by = null;
 
     #[ORM\Column(length: 255)]

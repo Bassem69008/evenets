@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello SubjectController!{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <h1 class="mt-5 pt-3">Liste des sujets </h1>
+
+    {% for subject in subjects %}
+        <div class="row ">
+        <div class="col bg-white mt-3 card-subject " style="border-radius:10px;">
+            <div class="card bg-white border-0">
+
+                <div class="card-body">
+                    <div class="subject-title">
+                        <h3 class="text-primary">{{ subject.title}} </h3>
+                        <div>
+                            <i class="fa fa-heart  text-danger" style="position:absolute;top:7px; right:9px;font-size:22px;" ></i><br>
+                            <span style="font-size:10px;position:absolute;top:27px; right:14px;">12</span>
+                        </div>
+                    </div>
+                    <p>
+                     {{ subject.description |raw(20) }}
+                    </p>
+
+                    <a href="{{ path('subjects_show',{slug:subject.slug}) }}" class="position-absolute text-info" style="bottom:7px;right:9px;text-decoration:none!important;">
+                        En savoir plus
+                        <i class=" fa fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+{% endblock %}
