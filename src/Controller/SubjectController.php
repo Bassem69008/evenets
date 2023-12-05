@@ -14,17 +14,24 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\Workflow\Registry;
+use Symfony\Component\Workflow\WorkflowInterface;
 
 #[Route('/sujets', name: 'subjects_')]
 class SubjectController extends AbstractController
 {
-    public function __construct(private SubjectRepository $subjectRepository, private SluggerInterface $slugger, private PaginatorService $paginator)
+    public function __construct(private SubjectRepository $subjectRepository, private SluggerInterface $slugger, private PaginatorService $paginator, private WorkflowInterface $subjectPublishingStateMachine)
     {
     }
 
     #[Route('/', name: 'index')]
     public function index(Request $request): Response
     {
+        $subject = new Subject();
+        //$workflow = $this->registry->get($subject, 'subject_publishing');
+       // dd($workflow->getEnabledTransitions($subject));
+       // dd($workflow->apply($subject,'to_review'));
+
         $subjects = $this->subjectRepository->findAll();
 
         return $this->render('subject/index.html.twig', [
@@ -40,6 +47,10 @@ class SubjectController extends AbstractController
             return $this->render('errors/404.html.twig');
         }
 
+        if($this->isGranted('ROLE_BOARD'))
+        {
+            //$this->subjectPublishingStateMachine->apply($subject,'to_review');
+        }
         return $this->render('subject/show.html.twig', \compact('subject'));
     }
 
