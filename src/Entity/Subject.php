@@ -60,6 +60,7 @@ class Subject
     #[ORM\Column]
     private ?bool $is_presented = false;
 
+    private string $currentState = 'draft';
     public function __construct()
     {
         $this->likes = new ArrayCollection();
@@ -225,5 +226,16 @@ class Subject
            }
         }
         return false;
+    }
+
+    public function getCurrentState(): string
+    {
+        return $this->currentState;
+    }
+
+    public function setCurrentState(string $currentState): self
+    {
+        $this->currentState = $currentState;
+        return $this;
     }
 }
