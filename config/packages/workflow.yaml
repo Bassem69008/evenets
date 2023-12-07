@@ -6,7 +6,7 @@ framework:
                 enabled: true
             marking_store:
                 type: 'method'
-                property: 'currentState'
+                property: 'status'
             supports:
                 - App\Entity\Subject
             initial_marking: draft
@@ -16,12 +16,19 @@ framework:
                 - rejected
                 - published
             transitions:
+                draft:
+                    guard: "is_granted('ROLE_BOARD')"
+                    from: rejected
+                    to: draft
                 to_review:
+                    guard: "is_granted('ROLE_BOARD')"
                     from: draft
                     to:   reviewed
                 publish:
+                    guard: "is_granted('ROLE_BOARD')"
                     from: reviewed
                     to:   published
                 reject:
+                    guard: "is_granted('ROLE_BOARD')"
                     from: reviewed
                     to:   rejected

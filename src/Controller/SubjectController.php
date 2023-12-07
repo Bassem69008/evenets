@@ -4,54 +4,74 @@ namespace App\Controller;
 
 use App\Entity\Subject;
 use App\Entity\SubjectLike;
-use App\Form\CreateSubjectType;
 use App\Repository\SubjectLikeRepository;
 use App\Repository\SubjectRepository;
 use App\Service\PaginatorService;
+use App\Service\SubjectService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
-use Symfony\Component\Workflow\Registry;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 #[Route('/sujets', name: 'subjects_')]
 class SubjectController extends AbstractController
 {
-    public function __construct(private SubjectRepository $subjectRepository, private SluggerInterface $slugger, private PaginatorService $paginator, private WorkflowInterface $subjectPublishingStateMachine)
-    {
+    public function __construct(
+        private SubjectRepository $subjectRepository, private SluggerInterface $slugger,
+        private PaginatorService $paginator,
+        private Security $security, private WorkflowInterface $subjectPublishing,
+        private SubjectService $subjectService,
+    ) {
     }
 
     #[Route('/', name: 'index')]
     public function index(Request $request): Response
     {
-        $subject = new Subject();
-        //$workflow = $this->registry->get($subject, 'subject_publishing');
-       // dd($workflow->getEnabledTransitions($subject));
-       // dd($workflow->apply($subject,'to_review'));
-
         $subjects = $this->subjectRepository->findAll();
 
         return $this->render('subject/index.html.twig', [
-            'pagination'=>$this->paginator->paginate($subjects,$request),
-
+            'pagination' => $this->paginator->paginate($subjects, $request),
         ]);
     }
 
     #[Route('/{slug}/show', name: 'show', methods: ['get'])]
     public function show(Subject $subject = null): Response
     {
-        if (!$subject) {
+        try {
+            $subject = $this->subjectService->show($subject);
+
+            return $this->render('subject/show.html.twig', \compact('subject'));
+        } catch (NotFoundHttpException $e) {
             return $this->render('errors/404.html.twig');
         }
+    }
 
-        if($this->isGranted('ROLE_BOARD'))
-        {
-            //$this->subjectPublishingStateMachine->apply($subject,'to_review');
-        }
+    #[Route('/{slug}/show/request-review', name : 'request_review')]
+    public function requestReview(Subject $subject, Request $request)
+    {
+        $subject->setStatus(Subject::STATUS_REVIEWED);
+        $this->subjectPublishing->can($subject, 'to_review');
+
+        $this->subjectRepository->save($subject);
+
         return $this->render('subject/show.html.twig', \compact('subject'));
+    }
+
+    #[Route('/{slug}/{state}/show/review', name: 'review')]
+    public function review(Subject $subject, string $state = null, Request $request)
+    {
+        try {
+            $subject = $this->subjectService->review($subject, $state);
+
+            return $this->render('subject/show.html.twig', \compact('subject'));
+        } catch (NotFoundHttpException $e) {
+            return $this->render('errors/404.html.twig');
+        }
     }
 
     #[Route('/creation', name: 'create')]
@@ -60,49 +80,29 @@ class SubjectController extends AbstractController
         if ($this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException('not allowed');
         }
-        $subject = (new Subject())
-            ->setOwnerId($this->getUser())
-            ->setStatus('draft')
-        ;
 
-        $form = $this->createForm(CreateSubjectType::class, $subject);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $subject->setSlug($this->slugger->slug($subject->getTitle()));
-            $this->subjectRepository->save($subject);
-
+        $result = $this->subjectService->create($request, $this->getUser());
+        if (true === $result) {
             return $this->redirectToRoute('subjects_index');
         }
 
-        return $this->render('subject/add.html.twig',
-            [
-                'form' => $form->createView(),
-                'user' => $subject,
-            ]);
+        return $this->render('subject/add.html.twig', $result);
     }
 
     #[Route('/{slug}/edit', name: 'edit')]
     public function edit(Subject $subject = null, Request $request)
     {
-        if (!$subject) {
+        try {
+            $result = $this->subjectService->edit($subject, $request);
+
+            if (true === $result) {
+                return $this->redirectToRoute('subjects_index');
+            }
+
+            return $this->render('subject/add.html.twig', $result);
+        } catch (NotFoundHttpException $e) {
             return $this->render('errors/404.html.twig');
         }
-
-        $form = $this->createForm(CreateSubjectType::class, $subject);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->subjectRepository->save($subject);
-
-            // on redirige vers la page des sujets
-            return $this->redirectToRoute('subjects_index');
-        }
-
-        return $this->render('subject/add.html.twig', [
-            'user' => $subject,
-            'form' => $form->createView(),
-        ]);
     }
 
     #[Route('/{id}/delete', name: 'delete', methods: ['get'])]
@@ -117,37 +117,33 @@ class SubjectController extends AbstractController
     }
 
     /**
-     * @param Subject $subject
-     * @param EntityManagerInterface $manager
-     * @param SubjectLikeRepository $likeRepo
      * @return Response
-     * Liker ou Unliker un sujet
+     *                  Liker ou Unliker un sujet
      */
-    #[Route('/{id}/like', name:'like', methods: ['get'])]
+    #[Route('/{id}/like', name: 'like', methods: ['get'])]
     public function like(Subject $subject, EntityManagerInterface $manager, SubjectLikeRepository $likeRepo): Response
     {
         // l'utilisateur n'est pas connecté
-       $user= $this->getUser();
+        $user = $this->getUser();
 
-     if ($this->isGranted('ROLE_ADMIN') || !$user) {
+        if ($this->isGranted('ROLE_ADMIN') || !$user) {
             return $this->json([
-                'code'=>403 ,
-                'message'=> 'unauthorized'
-            ],403);
+                'code' => 403,
+                'message' => 'unauthorized',
+            ], 403);
         }
 
-
         // le user est connecté est connecté et aime le sujet =>supprimer le like
-        if($subject->isLikedByUser($user)){
-            $like= $likeRepo->findOneBy(['subject'=>$subject, 'user'=>$user]);
+        if ($subject->isLikedByUser($user)) {
+            $like = $likeRepo->findOneBy(['subject' => $subject, 'user' => $user]);
             $manager->remove($like);
             $manager->flush();
 
             return $this->json([
-                'code'=>200 ,
-                'message'=> 'like supprimé',
-                'likes'=>$likeRepo->count(['subject'=>$subject])
-            ],200);
+                'code' => 200,
+                'message' => 'like supprimé',
+                'likes' => $likeRepo->count(['subject' => $subject]),
+            ], 200);
         }
         $like = new SubjectLike();
         $like->setSubject($subject);
@@ -158,9 +154,9 @@ class SubjectController extends AbstractController
 
         // le user est connecté n'aime âs le sujet => ajouter un like
         return $this->json([
-            'code'=>200 ,
-            'message'=> 'like ajouté',
-            'likes'=>$likeRepo->count(['subject'=>$subject])
-        ],200);
+            'code' => 200,
+            'message' => 'like ajouté',
+            'likes' => $likeRepo->count(['subject' => $subject]),
+        ], 200);
     }
 }

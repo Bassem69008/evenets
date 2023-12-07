@@ -17,6 +17,12 @@ class Subject
     use CreatedAtTrait;
     use UpdatedAtTrait;
     use SlugTrait;
+
+    public const STATUS_PUBLISHED = 'published';
+    public const STATUS_REVIEWED = 'reviewed';
+    public const STATUS_DRAFT = 'draft';
+    public const PUBLISH_TRANSITION = 'publish';
+    public const REJECT_TRANSITION = 'reject';
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -43,9 +49,6 @@ class Subject
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $duration = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $status = 'draft';
-
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?User $updated_by = null;
@@ -60,7 +63,9 @@ class Subject
     #[ORM\Column]
     private ?bool $is_presented = false;
 
-    private string $currentState = 'draft';
+    #[ORM\Column]
+    private ?string $status = 'draft';
+
     public function __construct()
     {
         $this->likes = new ArrayCollection();
@@ -145,18 +150,6 @@ class Subject
         return $this;
     }
 
-    public function getStatus(): ?string
-    {
-        return $this->status;
-    }
-
-    public function setStatus(string $status): static
-    {
-        $this->status = $status;
-
-        return $this;
-    }
-
     public function getEvents(): ?Events
     {
         return $this->events;
@@ -212,30 +205,29 @@ class Subject
     }
 
     /**
-     * @param User $user
      * @return bool
-     * savoir si le sujet est liké par un user
+     *              savoir si le sujet est liké par un user
      */
     public function isLikedByUser(User $user): bool
     {
-        foreach ($this->likes as $like)
-        {
-           if($like->getUser() === $user)
-           {
-               return true;
-           }
+        foreach ($this->likes as $like) {
+            if ($like->getUser() === $user) {
+                return true;
+            }
         }
+
         return false;
     }
 
-    public function getCurrentState(): string
+    public function getStatus(): ?string
     {
-        return $this->currentState;
+        return $this->status;
     }
 
-    public function setCurrentState(string $currentState): self
+    public function setStatus(?string $status): self
     {
-        $this->currentState = $currentState;
+        $this->status = $status;
+
         return $this;
     }
 }

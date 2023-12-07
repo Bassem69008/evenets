@@ -4,7 +4,6 @@ namespace App\Form;
 
 use App\Entity\Subject;
 use App\Entity\User;
-use FOS\CKEditorBundle\Form\Type\CKEditorType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
