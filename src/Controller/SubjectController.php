@@ -17,8 +17,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Workflow\WorkflowInterface;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/sujets', name: 'subjects_')]
+#[IsGranted("IS_AUTHENTICATED_FULLY")]
 class SubjectController extends AbstractController
 {
     public function __construct(
