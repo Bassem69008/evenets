@@ -9,7 +9,6 @@ use App\Repository\UserRepository;
 use App\Service\PaginatorService;
 use App\Service\SendMailService;
 use App\Service\UserService;
-use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,8 +24,7 @@ class UsersController extends AbstractController
         private UserService $userService, private UserRepository $userRepository,
         private UserPasswordHasherInterface $encoder, private SendMailService $mail,
         private PaginatorService $paginator
-    )
-    {
+    ) {
     }
 
     #[Route('/', name: 'index')]
@@ -38,7 +36,7 @@ class UsersController extends AbstractController
         $users = $this->userRepository->findAll();
 
         return $this->render('admin/users/index.html.twig', [
-            'pagination' => $this->paginator->paginate($this->userRepository->findAll(),$request)
+            'pagination' => $this->paginator->paginate($this->userRepository->findAll(), $request),
         ]);
     }
 

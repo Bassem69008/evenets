@@ -7,7 +7,9 @@ use Symfony\Component\HttpFoundation\Request;
 
 class PaginatorService
 {
-        public function __construct(private PaginatorInterface $paginator ){}
+    public function __construct(private PaginatorInterface $paginator)
+    {
+    }
 
     public function paginate($query, Request $request)
     {

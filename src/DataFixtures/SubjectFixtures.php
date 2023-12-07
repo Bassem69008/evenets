@@ -26,7 +26,7 @@ class SubjectFixtures extends Fixture implements DependentFixtureInterface
             $subject->setType($faker->randomElement(['Conférence', 'Atelier']));
             $subject->setIsPresented($faker->randomElement([false, true]));
             $subject->setDuration($faker->randomElement(['Court: 15min', 'Moyen: 30min', 'Long: 45min']));
-            $subject->setStatus($faker->randomElement(['draft', 'viewed', 'published', 'rejected']));
+            $subject->setStatus($faker->randomElement(['draft', 'reviewed', 'published', 'rejected']));
             $owner = $this->getReference('usr-'.\rand(1, 15));
             $subject->setOwnerId($owner);
             $this->setReference('sbj-'.$sbj, $subject);
