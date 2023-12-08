@@ -1,0 +1,136 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Sujets{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <h2>Mes Sujets</h2>
+
+        <div class="d-flex justify-content-between">
+            <a href="{{ path('subjects_create') }}" type="button" class="btn btn-primary my-3">Créer un sujet</a>
+            <!--<a href="#" data-toggle="modal" id="openModalUpload" type="button" class="btn btn-info my-3" data-target="#ModalUploadFile">Télécharger un fichier</a> -->
+        </div>
+
+        <div class="col-lg-12 mt-3">
+            <!-- -->
+            {% if  pagination|length > 0%}
+            <div class="table-responsive">
+                <table class="table table-hover text-nowrap table-responsive-lg text-center">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Titre</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">EDITION</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% set count = 0 %}
+                    {% for subject in pagination %}
+                        {% set count = count + 1 %}
+                        <tr>
+                            <td>{{ subject.id }}</td>
+                            <td>{{ subject.title }}</td>
+                            <td>{{ subject.description }}</td>
+                            <td>
+                                {% if subject.status =="published" %}
+                                <i class="fa fa-circle text-success"></i>
+                                {% elseif subject.status =="rejected" %}
+                                <i class="fa fa-circle text-danger"></i>
+                                {% elseif subject.status =="reviewed" %}
+                                <i class="fa fa-circle text-warning"></i>
+                                    {% else  %}
+                                        <i class="fa fa-circle text-muted"></i>
+                                        {% endif %}
+
+                            </td>
+                            <td></td>
+                            <td>
+                            <td>
+                                <a href="{{ path('subjects_edit', {slug: subject.slug}) }}" type="button" class="btn btn-warning">EDIT</a>
+                                <a href="{{ path('subjects_show', {slug:subject.slug}) }}" type="button" class="btn btn-info">Afficher</a>
+                                <a href="#" data-toggle="modal" type="button" class="btn btn-danger" data-target="#ModalDeletesubject" data-parametre={{ subject.id }}> Supprimer</a>
+                            </td>
+                            </td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+                </table>
+                <div class="pagination my-3">
+                    {{ knp_pagination_render(pagination, '/pagination/bootstrap_pagination.html.twig') }}
+                </div>
+            </div>
+            {% else %}
+            <p>Vous n'avez pas encore de sujets</p>
+            {% endif %}
+            <!-- -->
+        </div>
+
+        <!-- Delete subject Modal-->
+        <div class="modal fade" id="ModalDeletesubject" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Voulez-vous vraiment supprimer cet utilisateur </h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">Cette action est irréversible</div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        <a class="btn btn-primary" href="#" id="lienAvecParametre">Supprimer</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL UPLOAD FILE -->
+        <div class="modal fade" id="ModalUploadFile" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Veuillez Sélectionner Votre fichier </h5>
+                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="uploadModalBody">
+                        <!-- Le contenu du formulaire sera injecté ici après l'appel Ajax -->
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                        <a  type="submit" class="btn btn-primary" href="#" id="submitUploadForm">Enregistrer </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END MODAL UPLOAD FILE -->
+
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+
+    <script>
+        $(document).ready(function() {
+            // Lorsque le modal est sur le point d'être affiché
+            $('#ModalDeletesubject').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget); // Bouton qui a déclenché le modal
+
+                // On récupère la valeur du paramètre
+                var parametre = button.data('parametre');
+                // On met à jour le lien avec le nouveau paramètre
+                var lien = "{{ path('subjects_delete', {'id': 'VALEUR_DU_PARAMETRE'  }) }}";
+                lien = lien.replace('VALEUR_DU_PARAMETRE', parametre);
+
+                // On met  à jour l'attribut href du lien dans le modal
+                $('#lienAvecParametre').attr('href', lien);
+            });
+        });
+
+
+    </script>
+{% endblock %}
