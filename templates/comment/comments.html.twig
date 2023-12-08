@@ -1,0 +1,61 @@
+{%  extends 'base.html.twig' %}
+{%  block body %}
+<div class="container-fluid mt-5">
+
+    <section class="mt-4">
+        <div class="card pb-5 mb-3" style="border-radius:10px; border: 2px solid #fff;">
+            <div class="card-body mb-5">
+                <div class="table-responsive text-center">
+                    <table class="table table-hover ">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Commentaire</th>
+                            <th scope="col">Sujet</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Crée le </th>
+                            <th scope="col">Édition</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% set count = 0 %}
+                        {% for comment in comments %}
+                            {% set count = count + 1 %}
+                        <tr>
+
+                            <td>{{ comment.id }}</td>
+                            <td>{{ comment.content |length > 50 ? comment.content|slice(0, 50) ~ '...' : comment.content }}</td>
+                            <td>{{ comment.subjects.title }}</td>
+                            <td>
+                                {%  if comment.isActive %}
+                                <i class="fa fa-circle text-success"></i>
+                                {%  else  %}
+                                    <i class="fa fa-circle text-warning"></i>
+                                    {% endif %}
+                            </td>
+                            <td>{{ comment.createdAt|date('d-m-Y') }}</td>
+                            <td class="d-flex text-center justify-content-center ">
+                                <a href="{{ path('comments_manage',{id: comment.id, state:'reject'}) }}" type="button" class="btn btn-danger mr-2">Rejeter</a>
+                                <a href="{{ path('comments_manage',{id: comment.id, state:'publish'}) }}" type="button" class="btn btn-success">Publier</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="pagination my-3">
+                        {{ knp_pagination_render(comments, '/pagination/bootstrap_pagination.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+</div>
+
+{% endblock %}
+
+    {% block javascripts %}
+        <script src="{{ asset('assets/js/scripts.js') }}" ></script>
+
+    {% endblock %}

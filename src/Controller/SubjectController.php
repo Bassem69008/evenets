@@ -41,13 +41,16 @@ class SubjectController extends AbstractController
         ]);
     }
 
-    #[Route('/{slug}/show', name: 'show', methods: ['get'])]
-    public function show(Subject $subject = null): Response
+    #[Route('/{slug}/show', name: 'show', methods: ['GET','POST'])]
+    public function show(Subject $subject = null, Request $request): Response
     {
         try {
-            $subject = $this->subjectService->show($subject);
+            $result = $this->subjectService->show($subject, $this->getUser(), $request);
+            if (true === $result) {
+                return $this->redirectToRoute('subjects_index');
+            }
 
-            return $this->render('subject/show.html.twig', \compact('subject'));
+            return $this->render('subject/show.html.twig', $result);
         } catch (NotFoundHttpException $e) {
             return $this->render('errors/404.html.twig');
         }
@@ -82,8 +85,7 @@ class SubjectController extends AbstractController
         if ($this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException('not allowed');
         }
-
-        $result = $this->subjectService->create($request, $this->getUser());
+        $result = $this->subjectService->create( $this->getUser(),$request);
         if (true === $result) {
             return $this->redirectToRoute('subjects_index');
         }

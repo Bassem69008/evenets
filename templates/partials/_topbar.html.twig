@@ -23,6 +23,15 @@
         </li>
       {% endif %}
 
+      {% if is_granted("ROLE_BOARD")  %}
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Utilisateurs">
+          <a class="nav-link" href="{{ path('comments_index') }}">
+            <i class="fa fa-fw fa-users"></i>
+            <span class="nav-link-text">Commentaires</span>
+          </a>
+        </li>
+      {% endif %}
+
       <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Utilisateurs">
         <a class="nav-link" href="{{ path('subjects_index') }}">
           <i class="fa fa-fw fa-users"></i>
@@ -37,10 +46,10 @@
         </a>
         <ul class="sidenav-second-level collapse" id="collapseEvents">
           <li>
-            <a href="navbar.html"><i class="fa-regular fa-calendar-days text-dark"></i>Évenements</a>
+            <a href="#"><i class="fa-regular fa-calendar-days text-dark"></i>Évenements</a>
           </li>
           <li>
-            <a href="cards.html">Créer un évennement</a>
+            <a href="#">Créer un évennement</a>
           </li>
         </ul>
       </li>
