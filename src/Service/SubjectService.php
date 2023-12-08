@@ -2,15 +2,19 @@
 
 namespace App\Service;
 
+use App\Entity\Comment;
 use App\Entity\Subject;
 use App\Entity\User;
+use App\Form\CommentType;
 use App\Form\CreateSubjectType;
+use App\Repository\CommentRepository;
 use App\Repository\SubjectRepository;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Workflow\WorkflowInterface;
+use function dd;
 
 class SubjectService
 {
@@ -18,22 +22,42 @@ class SubjectService
         private WorkflowInterface $subjectPublishing,
         private SubjectRepository $subjectRepository,
         private FormFactoryInterface $formFactory,
-        private SluggerInterface $slugger
+        private SluggerInterface $slugger,
+        private CommentRepository $commentRepository
     ) {
     }
 
-    public function show(Subject $subject = null): ?Subject
+    public function show(Subject $subject = null, User $user=null, Request $request): mixed
     {
         if (!$subject) {
             throw new NotFoundHttpException('Sujet non trouvé');
         }
         $this->subjectPublishing->can($subject, Subject::PUBLISH_TRANSITION);
 
-        return $subject;
+        $comment = (new Comment())
+            ->setUser($user)
+            ->setSubjects($subject)
+            ;
+
+        $form = $this->formFactory->create(CommentType::class,$comment);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $this->commentRepository->save($comment);
+
+            return true;
+        }
+
+      return  ['form' => $form->createView(), 'subject' => $subject];
     }
 
-    public function create(Request $request, User $owner)
+    public function create(User $owner,Request $request)
     {
+        if(!$owner)
+        {
+            throw  new NotFoundHttpException('user not found');
+        }
         $subject = (new Subject())
              ->setOwnerId($owner)
              ->setStatus('draft');

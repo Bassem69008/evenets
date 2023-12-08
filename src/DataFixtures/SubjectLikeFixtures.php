@@ -13,7 +13,8 @@ class SubjectLikeFixtures extends Fixture implements DependentFixtureInterface
     public function load(ObjectManager $manager): void
     {
         $faker = Factory::create('fr_FR');
-
+        // get all Subjects which status is published
+        //
         for ($i = 0; $i < mt_rand(1, 100); ++$i) {
             $like = new SubjectLike();
             $user = $this->getReference('usr-'.\rand(1, 15));
