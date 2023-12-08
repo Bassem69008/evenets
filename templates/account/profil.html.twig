@@ -4,13 +4,10 @@
 
     <div class="photo bg-info align-middle rounded-circle position-absolute bottom text-center  " style="width:100px; height:100px; bottom:-40px; border:3px Solid #fff;">
         <h2 class="align-middle text-light" style="margin-top:27px;">{{ user.lastname|slice(0,1) }}{{ user.firstname|slice(0,1) }}</h2>
-        <a href="#" class="btn btn-info mt-5" style="right:1000px; top:50px;z-index:1000;">Modifier</a>
     </div>
-
-
-
-
+    <a href="{{ path('profile_edit',{id:user.id}) }}" class="btn btn-info mt-5 position-absolute" style="right:1000px; bottom:-13px;right:17%;z-index:1000;">Modifier</a>
 </div>
+
 
     <div class="container-fluid " style="width:100%;">
         <div class="title pt-4">
@@ -19,48 +16,51 @@
         </div>
     </div>
 
-<!-- evenements -->
-    <div class="container " style="width:100%;">
-        <h3 class="mb-2">Mes évenements</h3>
-<div class="row">
 
-    <div class="col-lg-4">
-        <div class="card bg-dark text-white h-100">
-            <img class="card-img" src="{{ asset('assets/images/bg.jpg') }}" alt="Card image">
-            <div class="card-img-overlay">
-                <h5 class="card-title">Card title</h5>
-                <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                <p class="card-text">Last updated 3 mins ago</p>
+
+
+    <!-- evenements -->
+    <div class="container  mt-3" style="width:100%;">
+        <h3 class="mb-3">Mes évenements</h3>
+        <div class="row">
+
+            <div class="col-lg-4">
+                <div class="card bg-dark text-white h-100">
+                    <img class="card-img" src="{{ asset('assets/images/bg.jpg') }}" alt="Card image">
+                    <div class="card-img-overlay">
+                        <h5 class="card-title">Card title</h5>
+                        <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                        <p class="card-text">Last updated 3 mins ago</p>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <div class="col-lg-4">
-        <div class="card bg-dark text-white h-100">
-            <img class="card-img" src="{{ asset('assets/images/bg.jpg') }}" alt="Card image">
-            <div class="card-img-overlay">
-                <h5 class="card-title">Card title</h5>
-                <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                <p class="card-text">Last updated 3 mins ago</p>
+            <div class="col-lg-4">
+                <div class="card bg-dark text-white h-100">
+                    <img class="card-img" src="{{ asset('assets/images/bg.jpg') }}" alt="Card image">
+                    <div class="card-img-overlay">
+                        <h5 class="card-title">Card title</h5>
+                        <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                        <p class="card-text">Last updated 3 mins ago</p>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <div class="col-lg-4">
-        <div class="card bg-dark text-white h-100">
-            <img class="card-img" src="{{ asset('assets/images/bg.jpg') }}" alt="Card image">
-            <div class="card-img-overlay">
-                <h5 class="card-title">Card title</h5>
-                <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                <p class="card-text">Last updated 3 mins ago</p>
+            <div class="col-lg-4">
+                <div class="card bg-dark text-white h-100">
+                    <img class="card-img" src="{{ asset('assets/images/bg.jpg') }}" alt="Card image">
+                    <div class="card-img-overlay">
+                        <h5 class="card-title">Card title</h5>
+                        <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                        <p class="card-text">Last updated 3 mins ago</p>
+                    </div>
+                </div>
             </div>
+
+
         </div>
-    </div>
-
-
-</div>
         <a href="#" class="btn btn-primary my-3 align-content-center">Voir tous mes évenements</a>
 
- </div>
+    </div>
 
 {% endblock %}
