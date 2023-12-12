@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {% if event.subjects|length() > 0 %}
+    <div class="event">
+        <div class="container my-4 pb-5" style="min-height:100%;">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="d-flex justify-content-between">
+                        <h2>{{ event.title }}</h2>
+
+                        <a href="#" class="btn mt-20 mr-10 text-white"><i class="far fa-ticket-alt"></i> S'inscrire</a>
+                    </div>
+                    <p>{{ event.description }}</p>
+
+
+
+                  {% for subject in event.subjects %}
+
+
+                        <div class="tab-content py-3 px-3 px-sm-0 wow fadeInDown animated" data-animation="fadeInDown animated" data-delay=".2s" id="nav-tabContent" style="visibility: visible; animation-name: fadeInDown;">
+                            <div class="tab-pane fade active show" id="one" role="tabpanel" aria-labelledby="nav-home-tab">
+                                <!-- row loop -->
+
+                                <div class="row mb-30">
+                                    <div class="col-lg-2">
+                                        <div class="user">
+                                            <div class="title">
+                                                <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="img">
+                                                <h5> {{ subject.speacker.lastname }} {{ subject.speacker.firstname }}</h5>
+                                                <p>UX Deisgn</p>
+                                            </div>
+                                            <ul>
+                                                <li>Café</li>
+                                                <li>Video Streaming</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-10">
+
+                                        <div class="event-list-content fix">
+                                            <ul data-animation="fadeInUp animated" data-delay=".2s" style="animation-delay: 0.2s;" class="">
+                                                <li>Mangareva, Lyon</li>
+                                                <li>{{ subject.duration }}</li>
+                                                <li>9.30 - 10.30 AM</li>
+                                            </ul>
+                                            <h2>{{ subject.title }}</h2>
+                                            <p>{{ subject.description }}</p>
+
+                                            <a href="{{ path('subjects_show',{slug:subject.slug}) }}" class="btn mt-20">En savoir plus</a>
+                                            <div class="crical"><i class="fal fa-video"></i> </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- row loop -->
+
+                            </div>
+                        </div>
+
+
+                  {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+        <p class="text-danger">Vous n'avez pas de sujets en cours veuillez rajouter</p>
+    {% endif %}
+{% endblock %}

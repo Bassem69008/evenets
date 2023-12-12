@@ -11,7 +11,6 @@ use Doctrine\Persistence\ManagerRegistry;
  *
  * @method Subject|null find($id, $lockMode = null, $lockVersion = null)
  * @method Subject|null findOneBy(array $criteria, array $orderBy = null)
- * @method Subject[]    findAll()
  * @method Subject[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class SubjectRepository extends ServiceEntityRepository
@@ -21,6 +20,10 @@ class SubjectRepository extends ServiceEntityRepository
         parent::__construct($registry, Subject::class);
     }
 
+    public function findAll()
+    {
+        return $this->findBy(array(), array('created_at' => 'DESC'));
+    }
     public function save(Subject $subject, bool $flush = true): Subject
     {
         $this->_em->persist($subject);

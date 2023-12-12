@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <div class="container-fluid">
+        <h2>Créer un évennement</h2>
+        {{ form_start(form) }}
+
+        <div class="col">{{ form_row(form.title) }}</div>
+        <div class="col">{{ form_row(form.description) }}</div>
+        <div class="col">{{ form_row(form.date) }}</div>
+        <div class="col">{{ form_row(form.subjects) }}</div>
+
+        {{ form_errors(form) }}
+
+
+        <div class="col"><button type="submit" class="btn btn-primary mt-4">
+                {% if mode == 'create' %}
+                Ajouter
+                {% else %}
+                Modifier
+                {% endif %}
+            </button></div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('.js-select2').select2({
+                placeholder: 'Select subjects',
+
+            });
+        });
+
+    </script>
+{% endblock %}

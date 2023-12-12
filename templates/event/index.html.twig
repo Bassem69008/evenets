@@ -1,0 +1,116 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Les Évennements{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <h2>Liste des évennements</h2>
+
+    <div class="d-flex justify-content-between">
+      {% if is_granted('ROLE_BOARD') %}
+          <a href="{{ path('events_create') }}" type="button" class="btn btn-primary my-3">Ajouter un évennement</a>
+        {% endif %}
+        <!--<a href="#" data-toggle="modal" id="openModalUpload" type="button" class="btn btn-info my-3" data-target="#ModalUploadFile">Télécharger un fichier</a> -->
+    </div>
+
+    <div class="col-lg-12 mt-3">
+        <div class="table-responsive">
+            <table class="table table-hover text-nowrap">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Heure</th>
+                    <th scope="col">Speackers</th>
+                    <th scope="col">Crée par </th>
+                    <th scope="col">Salle</th>
+                    <th scope="col">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% set count = 0 %}
+                {% for event in pagination %}
+                    {% set count = count + 1 %}
+                    <tr>
+                        <td>{{ event.id }}</td>
+                        <td>{{ event.date|date('d-m-Y') }}</td>
+                        <td>{{ event.date|date('h:i') }}</td>
+                        <td class="">
+                            <div class="d-flex">
+                                {% for subject in event.subjects %}
+                                <div class="speacker text-center bg-info " style="width:30px; border-radius:50%; border: 2px solid #fff;box-shadow: 1px 1px 1px 1px grey;">
+                                <!--------  ajouter les speackers ------------------------>
+                                </div>
+                                {% endfor %}
+                            </div>
+
+
+                        </td>
+                        <td>{{ event.createdBy.lastname }} {{ event.createdBy.firstname }}</td>
+                        <td>Mangareva</td>
+
+                        <td>
+                            {% if is_granted('ROLE_BOARD') %}
+                            <a href="{{ path('events_edit', {slug:event.slug}) }}" type="button" class="btn btn-warning">EDIT</a>
+                            {% endif %}
+                            <a href="{{ path('events_show',{slug:event.slug}) }}" type="button" class="btn btn-info">Afficher</a>
+                            {% if app.user == event.createdBy %}
+                                <a href="#" data-toggle="modal" type="button" class="btn btn-danger" data-target="#ModalDeleteEvent" data-parametre={{ event.id }}> Supprimer</a>
+                            {%  endif %}
+                        </td>
+
+                    </tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+            <div class="pagination my-3">
+                {{ knp_pagination_render(pagination, '/pagination/bootstrap_pagination.html.twig') }}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+    <!-- DELETE EVENT Modal-->
+    <div class="modal fade" id="ModalDeleteEvent" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Voulez-vous vraiment supprimer cet evennement  </h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Cette action est irréversible</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="#" id="lienAvecParametre">Supprimer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+
+
+        $(document).ready(function() {
+            // Lorsque le modal est sur le point d'être affiché
+            $('#ModalDeleteEvent').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget); // Bouton qui a déclenché le modal
+
+                // On récupère la valeur du paramètre
+                var parametre = button.data('parametre');
+                // On met à jour le lien avec le nouveau paramètre
+                var lien = "{{ path('events_delete', {'id': 'VALEUR_DU_PARAMETRE'  }) }}";
+                lien = lien.replace('VALEUR_DU_PARAMETRE', parametre);
+
+                // On met  à jour l'attribut href du lien dans le modal
+                $('#lienAvecParametre').attr('href', lien);
+            });
+        });
+    </script>
+{% endblock %}

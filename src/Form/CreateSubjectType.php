@@ -40,7 +40,7 @@ class CreateSubjectType extends AbstractType
                 ],
                 'attr' => ['class' => 'form-control my-2'],
             ])
-            ->add('speacker_id', EntityType::class, [
+            ->add('speacker', EntityType::class, [
                 'attr' => ['class' => 'form-control'],
                 'label' => 'proposer un présentateur',
                 'class' => User::class,
