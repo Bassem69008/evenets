@@ -29,9 +29,9 @@ class Events
     private ?string $description = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $date = null;
+    private ?\DateTime $date = null;
 
-    #[ORM\OneToMany(mappedBy: 'events', targetEntity: Subject::class)]
+    #[ORM\OneToMany(mappedBy: 'events', targetEntity: Subject::class, cascade: ["persist", "remove"])]
     private Collection $subjects;
 
     #[ORM\ManyToOne(inversedBy: 'events_created')]
@@ -88,12 +88,12 @@ class Events
         return $this;
     }
 
-    public function getDate(): ?\DateTimeImmutable
+    public function getDate(): ?\DateTime
     {
         return $this->date;
     }
 
-    public function setDate(\DateTimeImmutable $date): static
+    public function setDate(\DateTime $date): static
     {
         $this->date = $date;
 

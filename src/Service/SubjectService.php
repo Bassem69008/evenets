@@ -71,7 +71,7 @@ class SubjectService
             return true;
         }
 
-        return ['form' => $form->createView(), 'user' => $owner];
+        return ['form' => $form->createView(), 'user' => $owner, 'mode'=>'create'];
     }
 
     public function edit(Subject $subject = null, Request $request)
@@ -89,16 +89,29 @@ class SubjectService
             return true;
         }
 
-        return ['form' => $form->createView(), 'subject' => $subject];
+        return ['form' => $form->createView(), 'subject' => $subject, 'mode'=>'edit'];
     }
 
-    public function review(Subject $subject = null, string $state = null): ?Subject
+
+    public function requestReview(Subject $subject= null, Request $request, User $user)
+    {
+        $this->subjectPublishing->can($subject, 'to_review');
+        $subject->setStatus(Subject::STATUS_REVIEWED);
+
+        return $this->createComment($subject, $user, $request);
+
+
+    }
+
+    public function review(Subject $subject = null, string $state = null, User $user, Request $request): mixed
     {
         if (!$subject) {
             throw new NotFoundHttpException('Sujet non trouvé');
         }
         $this->subjectPublishing->can($subject, Subject::PUBLISH_TRANSITION);
         $this->subjectPublishing->can($subject, Subject::REJECT_TRANSITION);
+
+        $comment = $this->createComment($subject,$user, $request);
 
         switch ($state) {
             case 'publish':
@@ -113,6 +126,27 @@ class SubjectService
 
         $this->subjectRepository->save($subject);
 
-        return $subject;
+        return $comment;
+    }
+
+
+    public function createComment(Subject $subject ,User $user , Request $request)
+    {
+        $comment = (new Comment())
+            ->setUser($user)
+            ->setSubjects($subject)
+        ;
+        $this->subjectRepository->save($subject);
+
+        $form = $this->formFactory->create(CommentType::class,$comment);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $this->commentRepository->save($comment);
+
+            return true;
+        }
+        return ['form'=>$form->createView(), 'subject'=>$subject];
     }
 }

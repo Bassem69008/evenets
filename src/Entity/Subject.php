@@ -44,7 +44,7 @@ class Subject
 
     #[ORM\ManyToOne(inversedBy: 'talks')]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    private ?User $speacker_id = null;
+    private ?User $speacker = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $duration = null;
@@ -53,8 +53,7 @@ class Subject
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?User $updated_by = null;
 
-    #[ORM\ManyToOne(inversedBy: 'subjects')]
-    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    #[ORM\ManyToOne(inversedBy: 'subjects', cascade: ["persist", "remove"])]
     private ?Events $events = null;
 
     #[ORM\OneToMany(mappedBy: 'subject', targetEntity: SubjectLike::class)]
@@ -130,14 +129,14 @@ class Subject
         return $this;
     }
 
-    public function getSpeackerId(): ?User
+    public function getSpeacker(): ?User
     {
-        return $this->speacker_id;
+        return $this->speacker;
     }
 
-    public function setSpeackerId(?User $speacker_id): static
+    public function setSpeacker(?User $speacker): static
     {
-        $this->speacker_id = $speacker_id;
+        $this->speacker = $speacker;
 
         return $this;
     }

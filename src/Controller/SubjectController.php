@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\Comment;
 use App\Entity\Subject;
 use App\Entity\SubjectLike;
+use App\Form\CommentType;
 use App\Repository\SubjectLikeRepository;
 use App\Repository\SubjectRepository;
 use App\Service\PaginatorService;
@@ -59,21 +61,28 @@ class SubjectController extends AbstractController
     #[Route('/{slug}/show/request-review', name : 'request_review')]
     public function requestReview(Subject $subject, Request $request)
     {
-        $subject->setStatus(Subject::STATUS_REVIEWED);
-        $this->subjectPublishing->can($subject, 'to_review');
 
-        $this->subjectRepository->save($subject);
-
-        return $this->render('subject/show.html.twig', \compact('subject'));
+        $result = $this->subjectService->requestReview($subject, $request, $this->getUser());
+        if(true === $result)
+        {
+            return $this->redirectToRoute('subjects_index');
+        }
+        return $this->render('subject/show.html.twig', [
+            'form'=>$result['form'],
+            'subject' =>$result['subject']
+        ]);
     }
 
     #[Route('/{slug}/{state}/show/review', name: 'review')]
     public function review(Subject $subject, string $state = null, Request $request)
     {
         try {
-            $subject = $this->subjectService->review($subject, $state);
+            $result = $this->subjectService->review($subject, $state, $this->getUser(),  $request);
 
-            return $this->render('subject/show.html.twig', \compact('subject'));
+            return $this->render('subject/show.html.twig',[
+                'form'=>$result['form'],
+                'subject' =>$result['subject']
+            ]);
         } catch (NotFoundHttpException $e) {
             return $this->render('errors/404.html.twig');
         }

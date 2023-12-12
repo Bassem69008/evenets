@@ -1,0 +1,53 @@
+<?php
+
+namespace App\DataFixtures;
+
+use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Persistence\ObjectManager;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use App\Entity\Events;
+use Faker\Factory;
+
+class EventFixtures extends Fixture implements DependentFixtureInterface
+{
+    public function __construct(private SluggerInterface $slugger)
+    {
+    }
+    public function load(ObjectManager $manager): void
+    {
+        $faker = Factory::create('fr_FR');
+        $now = new \dateTime();
+        for($i= 1; $i<=10 ; $i++)
+        {
+            $event = new Events();
+            $event->setTitle($faker->text(55));
+            $event->setSlug($this->slugger->slug($event->getTitle())->lower());
+            $event->setDescription($faker->paragraph);
+            $event->setDate($faker->dateTimeBetween('-2 months', '+6 months'));
+            $event->getDate() > $now ? $event->setStatus('In progress'): $event->setStatus('Done');
+            $event->setCreatedBy( $this->getReference('usr-'.\rand(1, 15)));
+            for($j=1;$j<=5;$j++)
+            {
+                $subject= $this->getReference('sbj-'.\rand(1,50));
+                if(null == $subject->getSpeacker())
+                {
+                    $subject->setSpeacker(( $this->getReference('usr-'.\rand(1, 15))));
+                    $manager->persist($subject);
+                }
+            }
+            $manager->persist($event);
+        }
+        $manager->flush();
+    }
+
+    /**
+     *  method to force to load SubjectFixtures Before EventFixtures.
+     */
+    public function getDependencies(): array
+    {
+        return [
+            SubjectFixtures::class,
+        ];
+    }
+}
