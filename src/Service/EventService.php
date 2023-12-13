@@ -2,8 +2,10 @@
 
 namespace App\Service;
 use App\Entity\Subject;
+use App\Entity\Subscription;
 use App\Form\CreateEventType;
 use App\Form\CreateSubjectType;
+use App\Repository\SubscriptionRepository;
 use App\Service\PaginatorService;
 use App\Repository\EventsRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,7 +23,8 @@ class EventService
     public function __construct(
         private PaginatorService $paginatorService,
         private EventsRepository $eventRepository, private FormFactoryInterface $formFactory,private SluggerInterface $slugger,
-        private EntityManagerInterface $em, private ValidatorInterface $validator
+        private EntityManagerInterface $em, private ValidatorInterface $validator,
+        private SubscriptionRepository $subscriptionRepository
     ){}
 
 
@@ -93,31 +96,15 @@ class EventService
         $form = $this->formFactory->create(CreateEventType::class, $event);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            // Récupérer les sujets sélectionnés depuis le formulaire
             $selectedSubjects = $form->get('subjects')->getData();
 
-            // Ajouter chaque sujet à l'événement
             foreach ($selectedSubjects as $subject) {
                 $event->addSubject($subject);
             }
 
-            // Générer le slug
             $event->setSlug($this->slugger->slug($event->getTitle()));
 
-            // Persister l'événement et les sujets
-            $this->em->persist($event);
-
-            foreach ($selectedSubjects as $subject) {
-                // probleme dans le add  => requieert set @ask @arnaud //
-                /** @var Subject $subject */
-                $subject->setEvents($event);
-                $this->em->persist($subject);
-            }
-
-            $this->em->flush();
-
-            // Vérifier les sujets après flush
-            // dd($event->getSubjects());
+            $this->eventRepository->save($event);
 
             return true;
         }
@@ -126,4 +113,43 @@ class EventService
     }
 
 
+
+    public function subscription(Events $event, User $user, Request $request): bool
+    {
+        if(!$user || !$event)
+        {
+            return false;
+        }
+
+
+        $subscription = (new Subscription())
+            ->setEvent($event)
+            ->setUser($user)
+            ;
+        $this->subscriptionRepository->save($subscription);
+        $user->addSubscription($subscription);
+        $this->em->persist($user);
+       $this->em->flush();
+        return true;
+
+    }
+
+    public function unsubscribe(Events $event, User $user, Request $request): bool
+    {
+        if(!$user || !$event )
+        {
+            return false;
+        }
+
+        $subscription = $this->subscriptionRepository->findOneByEvent($event);
+       // $event->removeSubscription($subscription);
+        $this->em->remove($subscription);
+        $this->em->flush();
+
+       // $this->subscriptionRepository->remove($subscription);
+
+
+        return true;
+
+    }
 }

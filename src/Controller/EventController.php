@@ -62,19 +62,48 @@ class EventController extends AbstractController
         return $this->redirectToRoute('events_index');
     }
 
-#[Route('/{slug}/edit', name:'edit')]
-public function edit(Events $event= null, Request $request)
-{
-    try {
-        $result = $this->eventService->edit($event, $request);
+    #[Route('/{slug}/edit', name:'edit')]
+    public function edit(Events $event= null, Request $request)
+    {
+        try {
+            $result = $this->eventService->edit($event, $request);
 
-        if (true === $result) {
-            return $this->redirectToRoute('events_index');
+            if (true === $result) {
+                return $this->redirectToRoute('events_index');
+            }
+
+            return $this->render('event/add.html.twig', $result);
+        } catch (NotFoundHttpException $e) {
+            return $this->render('errors/404.html.twig');
         }
-
-        return $this->render('event/add.html.twig', $result);
-    } catch (NotFoundHttpException $e) {
-        return $this->render('errors/404.html.twig');
     }
-}
+
+    #[Route('/{slug}/inscription', name: 'subscription')]
+    public function subscription(Events $event= null, Request $request)
+    {
+
+        $result = $this->eventService->subscription($event, $this->getUser(), $request);
+        if(false === $result)
+        {
+            return $this->render('errors/404.html.twig');
+        }
+        return $this->render('event/show.html.twig',[
+            'event' =>$event
+        ]);
+    }
+
+    #[Route('/{slug}/desinscription', name: 'unsubscribe')]
+    public function unsubscribe(Events $event= null ,Request $request)
+    {
+
+        $result = $this->eventService->unsubscribe($event, $this->getUser(), $request);
+
+        if(false === $result)
+        {
+            return $this->render('errors/404.html.twig');
+        }
+        return $this->render('event/show.html.twig',[
+            'event' =>$event
+        ]);
+    }
 }

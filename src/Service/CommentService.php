@@ -10,6 +10,7 @@ use App\Repository\CommentRepository;
 use PHPUnit\Util\Exception;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CommentService
@@ -18,37 +19,42 @@ class CommentService
     public function __construct(private CommentRepository $commentRepository, private FormFactoryInterface $formFactory){}
 
 
-    public function create(Subject $subject = null, User $user = null,Comment $parent=null,Request $request, ?string $content)
+    public function create(Subject $subject = null, User $user = null, Comment $parent = null, Request $request, ?string $content)
     {
-        if(null ==$subject || null == $user)
-        {
-            throw new NotFoundHttpException('erreur de soumission');
+        if (null == $subject || null == $user) {
+            throw new BadRequestHttpException('Erreur de soumission');
         }
 
         $comment = (new Comment())
             ->setUser($user)
             ->setSubjects($subject);
 
-   if(null !== $parent)
-   {
-       $comment->setParent($parent)
-           ->setContent($content);
-
-       $this->commentRepository->save($comment);
-
-       return true;
-   }
-        $form = $this->formFactory->create(CommentType::class, $comment);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-
-            $this->commentRepository->save($comment);
-
-            return true;
+        if (null !== $parent) {
+            return $this->createReply($comment, $parent, $content);
         }
 
-        return ['form' => $form->createView(), 'comment' => $comment];
+        $form = $this->formFactory->create(CommentType::class, $comment);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->commentRepository->save($comment);
+
+            return ['success' => true];
+        }
+
+        return ['success' => false, 'form' => $form->createView(), 'comment' => $comment];
     }
+
+    private function createReply(Comment $comment, Comment $parent, string $content)
+    {
+        $comment->setParent($parent)
+            ->setContent($content);
+
+        $this->commentRepository->save($comment);
+
+        return ['success' => true, 'parent'=>$parent, 'subject'=> $parent->getSubjects()->getSlug(), 'comment'=>$comment];
+    }
+
 
     public function manage(Comment $comment, ?string $state, Request $request): void
     {

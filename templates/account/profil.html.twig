@@ -16,53 +16,65 @@
         </div>
     </div>
 
+    <div class="container-fluid">
+        <!-- Carousel -->
+        <section class="pt-5 pb-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-6">
+                        <h3 class="mb-3">Mes évennements</h3>
+                    </div>
+                    <div class="col-6 text-right">
+                        <a class="btn btn-primary mb-3 mr-1" href="#carouselExampleIndicators2" role="button" data-slide="prev">
+                            <i class="fa fa-arrow-left"></i>
+                        </a>
+                        <a class="btn btn-primary mb-3 " href="#carouselExampleIndicators2" role="button" data-slide="next">
+                            <i class="fa fa-arrow-right"></i>
+                        </a>
+                    </div>
+                    <div class="col-12">
+                        <div id="carouselExampleIndicators2" class="carousel slide" data-ride="carousel">
+                            <ol class="carousel-indicators">
+                                {% for subscription in user.subscriptions %}
+                                    <li data-target="#carouselExampleIndicators2" data-slide-to="{{ loop.index0 }}" {% if loop.first %}class="active"{% endif %}></li>
+                                {% endfor %}
+                            </ol>
+
+                            <div class="carousel-inner">
+                                {% for subscription in user.subscriptions %}
+                                    <div class="carousel-item {% if loop.first %}active{% endif %}">
+                                        <div class="row">
+                                            <div class="col-md-4 mb-3">
+                                                <div class="card" style="border-radius:10px;">
+                                                    <img class="img-fluid" alt="100%x280" src="https://memberpress.com/wp-content/uploads/2019/10/Member-Meetup@2x.png">
+                                                    <div class="card-body">
+                                                        <h4 class="card-title">{{ subscription.event.title }}</h4>
+                                                        <p class="card-text">{{ subscription.event.description }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
 
 
 
 
 
     <!-- evenements -->
-    <div class="container  mt-3" style="width:100%;">
-        <h3 class="mb-3">Mes évenements</h3>
-        <div class="row">
-
-            <div class="col-lg-4">
-                <div class="card bg-dark text-white h-100">
-                    <img class="card-img" src="{{ asset('assets/images/bg.jpg') }}" alt="Card image">
-                    <div class="card-img-overlay">
-                        <h5 class="card-title">Card title</h5>
-                        <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                        <p class="card-text">Last updated 3 mins ago</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4">
-                <div class="card bg-dark text-white h-100">
-                    <img class="card-img" src="{{ asset('assets/images/bg.jpg') }}" alt="Card image">
-                    <div class="card-img-overlay">
-                        <h5 class="card-title">Card title</h5>
-                        <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                        <p class="card-text">Last updated 3 mins ago</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4">
-                <div class="card bg-dark text-white h-100">
-                    <img class="card-img" src="{{ asset('assets/images/bg.jpg') }}" alt="Card image">
-                    <div class="card-img-overlay">
-                        <h5 class="card-title">Card title</h5>
-                        <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                        <p class="card-text">Last updated 3 mins ago</p>
-                    </div>
-                </div>
-            </div>
 
 
-        </div>
-        <a href="#" class="btn btn-primary my-3 align-content-center">Voir tous mes évenements</a>
+{% endblock %}
 
-    </div>
+{% block javascripts %}
+
 
 {% endblock %}

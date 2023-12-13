@@ -24,6 +24,8 @@
                     <th scope="col">Speackers</th>
                     <th scope="col">Crée par </th>
                     <th scope="col">Salle</th>
+                    <th scope="col">Inscris</th>
+
                     <th scope="col">Action</th>
                 </tr>
                 </thead>
@@ -38,16 +40,21 @@
                         <td class="">
                             <div class="d-flex">
                                 {% for subject in event.subjects %}
-                                <div class="speacker text-center bg-info " style="width:30px; border-radius:50%; border: 2px solid #fff;box-shadow: 1px 1px 1px 1px grey;">
+                                <div class="speacker text-center bg-info mr-1 " style="width:30px; border-radius:50%; border: 2px solid #fff;box-shadow: 1px 1px 1px 1px grey;">
+
                                 <!--------  ajouter les speackers ------------------------>
+                                    {{ subject.speacker.lastname|slice(0,1) }}{{ subject.speacker.firstname|slice(0,1) }}
+
                                 </div>
                                 {% endfor %}
+
                             </div>
 
 
                         </td>
                         <td>{{ event.createdBy.lastname }} {{ event.createdBy.firstname }}</td>
                         <td>Mangareva</td>
+                        <td>{{ event.subscriptions|length }}</td>
 
                         <td>
                             {% if is_granted('ROLE_BOARD') %}
@@ -111,6 +118,6 @@
                 // On met  à jour l'attribut href du lien dans le modal
                 $('#lienAvecParametre').attr('href', lien);
             });
-        });
+        %});
     </script>
 {% endblock %}

@@ -25,10 +25,12 @@ class Comment
     private ?bool $is_active = false;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
     #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Subject $subjects = null;
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'comments')]

@@ -1,4 +1,4 @@
-{% if comment.isActive %}
+{% if comment.isActive and comment.parent is null %}
 <div class="comment bg-white p-2" style="border-radius:10px;">
 
     <div class="d-flex flex-row user-info">
