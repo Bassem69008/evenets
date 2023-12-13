@@ -36,6 +36,8 @@ class EventFixtures extends Fixture implements DependentFixtureInterface
                     $manager->persist($subject);
                 }
             }
+            // add reference
+            $this->setReference('evt-'.$i, $event);
             $manager->persist($event);
         }
         $manager->flush();

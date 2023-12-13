@@ -54,6 +54,7 @@ class Subject
     private ?User $updated_by = null;
 
     #[ORM\ManyToOne(inversedBy: 'subjects', cascade: ["persist", "remove"])]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Events $events = null;
 
     #[ORM\OneToMany(mappedBy: 'subject', targetEntity: SubjectLike::class)]

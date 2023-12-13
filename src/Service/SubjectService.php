@@ -108,6 +108,7 @@ class SubjectService
         if (!$subject) {
             throw new NotFoundHttpException('Sujet non trouvé');
         }
+        /** remettre apply */
         $this->subjectPublishing->can($subject, Subject::PUBLISH_TRANSITION);
         $this->subjectPublishing->can($subject, Subject::REJECT_TRANSITION);
 

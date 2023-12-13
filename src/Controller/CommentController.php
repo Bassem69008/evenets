@@ -42,7 +42,7 @@ class CommentController extends AbstractController
 
         $content= $request->get('_comment');
         $result = $this->commentService->create($subject, $this->getUser(),$parent,$request, $content);
-        if (true === $result) {
+        if (true === $result['success']) {
             return $this->redirectToRoute('subjects_show',['slug'=>$subject->getSlug()]);
         }
 

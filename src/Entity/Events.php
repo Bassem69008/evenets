@@ -52,11 +52,15 @@ class Events
     #[ORM\Column]
     private ?\DateTimeImmutable $updated_at = null;
 
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Subscription::class, orphanRemoval: true)]
+    private Collection $subscriptions;
+
     public function __construct()
     {
         $this->subjects = new ArrayCollection();
         $this->created_at = new \DateTimeImmutable();
         $this->updated_at = new \DateTimeImmutable();
+        $this->subscriptions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -162,6 +166,36 @@ class Events
     public function setStatus(string $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Subscription>
+     */
+    public function getSubscriptions(): Collection
+    {
+        return $this->subscriptions;
+    }
+
+    public function addSubscription(Subscription $subscription): static
+    {
+        if (!$this->subscriptions->contains($subscription)) {
+            $this->subscriptions->add($subscription);
+            $subscription->setEvent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSubscription(Subscription $subscription): static
+    {
+        if ($this->subscriptions->removeElement($subscription)) {
+            // set the owning side to null (unless already changed)
+            if ($subscription->getEvent() === $this) {
+                $subscription->setEvent(null);
+            }
+        }
 
         return $this;
     }

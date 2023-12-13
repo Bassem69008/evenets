@@ -9,7 +9,29 @@
                     <div class="d-flex justify-content-between">
                         <h2>{{ event.title }}</h2>
 
-                        <a href="#" class="btn mt-20 mr-10 text-white"><i class="far fa-ticket-alt"></i> S'inscrire</a>
+                        {% set currentUserID = app.user.id %}
+                        {% set userAlreadySubscribed = false %}
+
+                        {% for subscription in event.subscriptions %}
+                            {% if currentUserID == subscription.user.id %}
+                                {% set userAlreadySubscribed = true %}
+                                {# Vous pouvez ajouter d'autres actions ici si nécessaire #}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if userAlreadySubscribed %}
+                            <p class="badge badge-success">Vous êtes déjà inscrit</p>
+                            <a href="{{ path('events_unsubscribe',{slug:event.slug}) }}" class="btn btn-danger">Se désinscrire</a>
+                        {% else %}
+                            <a href="{{ path('events_subscription', { slug: event.slug }) }}" class="btn btn-primary  text-white">
+                                <i class="far fa-ticket-alt"></i> S'inscrire
+                            </a>
+                        {% endif %}
+
+
+
+
+
                     </div>
                     <p>{{ event.description }}</p>
 
@@ -66,5 +88,6 @@
     </div>
     {% else %}
         <p class="text-danger">Vous n'avez pas de sujets en cours veuillez rajouter</p>
+        <a href="{{ path('events_edit',{slug:event.slug}) }}" class="btn btn-primary">Ajouter</a>
     {% endif %}
 {% endblock %}
