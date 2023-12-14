@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Comment;
+use App\Repository\Trait\RemoveTrait;
+use App\Repository\Trait\SaveTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -15,6 +17,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class CommentRepository extends ServiceEntityRepository
 {
+    use SaveTrait;
+    use RemoveTrait;
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Comment::class);
@@ -25,21 +29,5 @@ class CommentRepository extends ServiceEntityRepository
     {
         return $this->findBy(array(), array('created_at' => 'DESC'));
     }
-    public function save(Comment $comment, bool $flush = true): Comment
-    {
-        $this->_em->persist($comment);
-        if ($flush) {
-            $this->_em->flush();
-        }
 
-        return $comment;
-    }
-
-    public function remove(Comment $comment, bool $flush = true): void
-    {
-        $this->_em->remove($comment);
-        if ($flush) {
-            $this->_em->flush();
-        }
-    }
 }

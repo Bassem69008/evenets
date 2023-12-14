@@ -29,6 +29,30 @@ class UserFixtures extends Fixture
 
         $manager->persist($admin);
 
+        /** Create Board  */
+        $board = new User();
+        $board->setLastname('Ronaldo');
+        $board->setFirstname('Cristiano');
+        $board->setEmail('board@exemple.com');
+        $board->setDo('DSF');
+        $board->setSite('Lyon');
+        $board->setRoles(['ROLE_BOARD']);
+        $board->setPassword($this->passwordEncoder->hashPassword($board, 'passwordBoard'));
+
+        $manager->persist($board);
+
+        /** Create User  */
+        $user = new User();
+        $user->setLastname('Messi');
+        $user->setFirstname('Lionel');
+        $user->setEmail('user@exemple.com');
+        $user->setDo('DSF');
+        $user->setSite('Lyon');
+        $user->setRoles(['ROLE_CONNECTED']);
+        $user->setPassword($this->passwordEncoder->hashPassword($user, 'passwordUser'));
+
+        $manager->persist($user);
+
         /* Create Boards */
         $this->createUser(5, ['ROLE_BOARD'], 'passwordBoard', $manager);
 

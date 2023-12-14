@@ -4,14 +4,15 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Form\UploadFileType;
-use App\Form\UserCreateType;
 use App\Repository\UserRepository;
 use App\Service\PaginatorService;
-use App\Service\SendMailService;
+use App\Service\Emails\SendMailService;
+use App\Service\Users\UploadUsersService;
 use App\Service\UserService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -23,59 +24,22 @@ class UsersController extends AbstractController
     public function __construct(
         private UserService $userService, private UserRepository $userRepository,
         private UserPasswordHasherInterface $encoder, private SendMailService $mail,
-        private PaginatorService $paginator
+        private PaginatorService $paginator,
+        private UploadUsersService $uploadUsersService
     ) {
     }
 
-    #[Route('/', name: 'index')]
+    #[Route('', name: 'index', methods: ['GET'])]
     public function index(Request $request): Response
     {
-        if (!$this->isGranted('ROLE_ADMIN')) {
+
+       if (!$this->isGranted('ROLE_ADMIN')) {
             return $this->render('errors/403.html.twig');
         }
-        $users = $this->userRepository->findAll();
 
         return $this->render('admin/users/index.html.twig', [
             'pagination' => $this->paginator->paginate($this->userRepository->findAll(), $request),
         ]);
-    }
-
-    #[Route('/creation', name: 'create')]
-    public function add(Request $request)
-    {
-        $user = new User();
-        // on crée le mot de passe etv on le set
-        $password = $this->userService->createPassword();
-        $user->setPassword($this->encoder->hashPassword($user, $password));
-
-        // on crée le formulaire
-        $form = $this->createForm(UserCreateType::class, $user);
-        $form->handleRequest($request);
-
-        // on traite le formulaire
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->userRepository->save($user);
-            // envoi de mail pour l'utilisateur
-            $this->mail->send(
-                'no-reply@monsite.net',
-                $user->getEmail(),
-                'Ajout de votre compte',
-                'addUser',
-                [
-                    'user' => $user,
-                    'password' => $password,
-                ]
-            );
-
-            // on redirige  vers la page des users
-            return $this->redirectToRoute('users_index');
-        }
-
-        return $this->render('admin/users/add.html.twig',
-            [
-                'form' => $form->createView(),
-                'user' => $user,
-            ]);
     }
 
     #[Route('/{id}/show', name: 'show', methods: ['get'])]
@@ -88,57 +52,70 @@ class UsersController extends AbstractController
         return $this->render('admin/users/show.html.twig', \compact('user'));
     }
 
+    #[Route('/creation', name: 'create', methods: ['GET','POST'])]
+    public function add(Request $request)
+    {
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException('not allowed');
+        }
+        try{
+
+            $result = $this->userService->create($request);
+
+            if (true === $result) {
+                return $this->redirectToRoute('users_index');
+            }
+            return $this->render('admin/users/add.html.twig', $result);
+        }catch(\Exception $e)
+        {
+            return $e->getMessage();
+        }
+    }
+
     #[Route('/{id}/edit', name: 'edit')]
     public function edit(User $user = null, Request $request)
     {
-        if (!$user) {
+        try {
+            $result = $this->userService->edit($user, $request);
+
+            if (true === $result) {
+                return $this->redirectToRoute('users_index');
+            }
+
+            return $this->render('admin/users/add.html.twig', $result);
+        }catch(NotFoundHttpException $e)
+        {
             return $this->render('errors/404.html.twig');
         }
-
-        $form = $this->createForm(UserCreateType::class, $user);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->userRepository->save($user);
-
-            // on redirige vers la page des utilisateurs
-            return $this->redirectToRoute('users_index');
-        }
-
-        return $this->render('admin/users/edit.html.twig', [
-            'user' => $user,
-            'form' => $form->createView(),
-        ]);
     }
+
 
     #[Route('/{id}/delete', name: 'delete', methods: ['get'])]
     public function delete(User $user = null, Request $request)
     {
-        if (!$user) {
+        try{
+            $this->userService->delete($user, $request);
+            return $this->redirectToRoute('users_index');
+        }catch(NotFoundHttpException $e)
+        {
             return $this->render('errors/404.html.twig');
         }
-        $this->userRepository->remove($user);
-
-        return $this->redirectToRoute('users_index');
     }
 
     #[Route('/upload', name: 'upload')]
     public function upload(Request $request)
     {
-        $form = $this->createForm(UploadFileType::class);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $uploadedFile = $form->get('file')->getData();
-            if ($uploadedFile) {
-                $this->userService->processFile($uploadedFile);
-            }
-
-            return $this->redirectToRoute('users_index');
+        try{
+           $result= $this->uploadUsersService->uploadUsers($request);
+           if(true === $result)
+           {
+               return $this->redirectToRoute('users_index');
+           }
+            return $this->render('upload/upload.html.twig', $result);
+        }catch(\Exception $e)
+        {
+            return $e->getMessage();
         }
 
-        return $this->render('upload/upload.html.twig', [
-            'form' => $form->createView(),
-        ]);
     }
 }

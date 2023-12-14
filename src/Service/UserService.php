@@ -3,7 +3,12 @@
 namespace App\Service;
 
 use App\Entity\User;
+use App\Form\UploadFileType;
+use App\Form\UserCreateType;
 use App\Repository\UserRepository;
+use App\Service\Emails\SendMailService;
+use App\Service\SpreadSheet\SpreadSheetService;
+use App\Service\Utils\CrudEntityService;
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -12,66 +17,39 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserService
 {
+    const PASSWORD_PROPERTY="password";
     public function __construct(
         private FormFactoryInterface $formFactory, private EntityManagerInterface $em,
         private SendMailService $mail, private UserPasswordHasherInterface $encoder,
-        private UserRepository $userRepository
+        private UserRepository $userRepository, private CrudEntityService $entityService,
+        private SendMailService $mailService,
+        private SpreadSheetService $sheetService
     ) {
     }
 
-    public function create(Request $request, bool $isSuccess)
+    public function create(Request $request)
     {
+        $user = new User();
+        $user->setPassword($this->createPassword());
+        $properties = [self::PASSWORD_PROPERTY];
+        return $this->entityService->createOrUpdate($user, UserCreateType::class, $request, true, $properties);
     }
 
-    public function edit()
+    public function edit(User $user=null, Request $request)
     {
+        return $this->entityService->createOrUpdate($user, UserCreateType::class,$request,false,null);
     }
 
-    public function processFile($uploadedFile): void
+    public function delete(User $user= null, Request $request)
     {
-        $spreadsheet = IOFactory::load($uploadedFile);
-        $data = $spreadsheet->getActiveSheet()->toArray(null, true, true, false);
-        $this->saveUsers($data);
+        $this->entityService->delete($user, $request);
     }
 
-    public function saveUsers(array $data): void
-    {
-        // on supprime tous les utilisateurs pour eviter la duplication
-        $this->removeUsers();
 
-        array_shift($data);
-        foreach ($data as $row) {
-            $user = (new User())
-                ->setLastname($row[0] ?? '')
-                ->setFirstname($row[1] ?? '')
-                ->setEmail($row[2] ?? '')
-                ->setDo($row[3] ?? '')
-                ->setSite($row[4] ?? '')
-                ->setPassword($this->createPassword())
-
-            ;
-            $this->em->persist($user);
-            //   // envoi de mail pour l'utilisateur
-            $this->sendMail($user);
-        }
-        $this->em->flush();
-    }
-
-    public function sendMail(User $user): void
-    {
-        $this->mail->send(
-            'no-reply@monsite.net',
-            $user->getEmail(),
-            'Ajout de votre compte',
-            'addUser',
-            [
-                'user' => $user,
-                'password' => $user->getPassword(),
-            ]
-        );
-    }
-
-    public function createPassword($length = 8)
+    /**
+     * create random password
+     */
+    public  function createPassword( $length = 8): string
     {
         $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $string = '';
@@ -81,6 +59,10 @@ class UserService
 
         return $string;
     }
+
+
+
+
 
     public function removeUsers(): void
     {

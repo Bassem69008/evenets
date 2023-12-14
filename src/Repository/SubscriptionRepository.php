@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\Subject;
 use App\Entity\Subscription;
+use App\Repository\Trait\RemoveTrait;
+use App\Repository\Trait\SaveTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -17,26 +19,12 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class SubscriptionRepository extends ServiceEntityRepository
 {
+    use SaveTrait;
+    use RemoveTrait;
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Subscription::class);
     }
 
-    public function save(Subscription $subscription, bool $flush = true): Subscription
-    {
-        $this->_em->persist($subscription);
-        if ($flush) {
-            $this->_em->flush();
-        }
 
-        return $subscription;
-    }
-
-    public function remove(Subscription $subscription, bool $flush = true): void
-    {
-        $this->_em->remove($subscription);
-        if ($flush) {
-            $this->_em->flush();
-        }
-    }
 }

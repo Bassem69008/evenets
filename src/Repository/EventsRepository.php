@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Events;
+use App\Repository\Trait\RemoveTrait;
+use App\Repository\Trait\SaveTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -15,6 +17,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class EventsRepository extends ServiceEntityRepository
 {
+    use SaveTrait;
+    use RemoveTrait;
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Events::class);
@@ -25,21 +29,4 @@ class EventsRepository extends ServiceEntityRepository
         return $this->findBy(array(), array('created_at' => 'DESC'));
     }
 
-    public function save(events $events, bool $flush = true): Events
-    {
-        $this->_em->persist($events);
-        if ($flush) {
-            $this->_em->flush();
-        }
-
-        return $events;
-    }
-
-    public function remove(events $events, bool $flush = true): void
-    {
-        $this->_em->remove($events);
-        if ($flush) {
-            $this->_em->flush();
-        }
-    }
 }
