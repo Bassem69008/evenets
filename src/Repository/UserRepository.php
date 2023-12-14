@@ -3,6 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Repository\Trait\RemoveTrait;
+use App\Repository\Trait\SaveTrait;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -21,28 +23,13 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
+    use SaveTrait;
+    use RemoveTrait;
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, User::class);
     }
 
-    public function save(User $user, bool $flush = true): User
-    {
-        $this->_em->persist($user);
-        if ($flush) {
-            $this->_em->flush();
-        }
-
-        return $user;
-    }
-
-    public function remove(User $user, bool $flush = true): void
-    {
-        $this->_em->remove($user);
-        if ($flush) {
-            $this->_em->flush();
-        }
-    }
 
     /**
      * Used to upgrade (rehash) the user's password automatically over time.

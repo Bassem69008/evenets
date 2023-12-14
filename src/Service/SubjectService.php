@@ -9,6 +9,7 @@ use App\Form\CommentType;
 use App\Form\CreateSubjectType;
 use App\Repository\CommentRepository;
 use App\Repository\SubjectRepository;
+use App\Service\Utils\CrudEntityService;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -18,12 +19,14 @@ use function dd;
 
 class SubjectService
 {
+    const SLUG_PROPERTY="slug";
     public function __construct(
         private WorkflowInterface $subjectPublishing,
         private SubjectRepository $subjectRepository,
         private FormFactoryInterface $formFactory,
         private SluggerInterface $slugger,
-        private CommentRepository $commentRepository
+        private CommentRepository $commentRepository,
+        private CrudEntityService $entityService
     ) {
     }
 
@@ -39,17 +42,8 @@ class SubjectService
             ->setSubjects($subject)
             ;
 
-        $form = $this->formFactory->create(CommentType::class,$comment);
-        $form->handleRequest($request);
+        return $this->entityService->createOrUpdate($comment,CommentType::class,$request, false, null,$subject);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-
-            $this->commentRepository->save($comment);
-
-            return true;
-        }
-
-      return  ['form' => $form->createView(), 'subject' => $subject];
     }
 
     public function create(User $owner,Request $request)
@@ -61,17 +55,8 @@ class SubjectService
         $subject = (new Subject())
              ->setOwnerId($owner)
              ->setStatus('draft');
+        return $this->entityService->createOrUpdate($subject,CreateSubjectType::class, $request, false, [self::SLUG_PROPERTY] );
 
-        $form = $this->formFactory->create(CreateSubjectType::class, $subject);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $subject->setSlug($this->slugger->slug($subject->getTitle()));
-            $this->subjectRepository->save($subject);
-
-            return true;
-        }
-
-        return ['form' => $form->createView(), 'user' => $owner, 'mode'=>'create'];
     }
 
     public function edit(Subject $subject = null, Request $request)
@@ -80,16 +65,8 @@ class SubjectService
             throw new NotFoundHttpException('Sujet Introuvable');
         }
 
-        $form = $this->formFactory->create(CreateSubjectType::class, $subject);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $subject->setSlug($this->slugger->slug($subject->getTitle()));
-            $this->subjectRepository->save($subject);
+        return $this->entityService->createOrUpdate($subject,CreateSubjectType::class, $request, false, [self::SLUG_PROPERTY] );
 
-            return true;
-        }
-
-        return ['form' => $form->createView(), 'subject' => $subject, 'mode'=>'edit'];
     }
 
 

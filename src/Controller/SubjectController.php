@@ -48,41 +48,12 @@ class SubjectController extends AbstractController
     {
         try {
             $result = $this->subjectService->show($subject, $this->getUser(), $request);
+
             if (true === $result) {
                 return $this->redirectToRoute('subjects_index');
             }
 
             return $this->render('subject/show.html.twig', $result);
-        } catch (NotFoundHttpException $e) {
-            return $this->render('errors/404.html.twig');
-        }
-    }
-
-    #[Route('/{slug}/show/request-review', name : 'request_review')]
-    public function requestReview(Subject $subject, Request $request)
-    {
-
-        $result = $this->subjectService->requestReview($subject, $request, $this->getUser());
-        if(true === $result)
-        {
-            return $this->redirectToRoute('subjects_index');
-        }
-        return $this->render('subject/show.html.twig', [
-            'form'=>$result['form'],
-            'subject' =>$result['subject']
-        ]);
-    }
-
-    #[Route('/{slug}/{state}/show/review', name: 'review')]
-    public function review(Subject $subject, string $state = null, Request $request)
-    {
-        try {
-            $result = $this->subjectService->review($subject, $state, $this->getUser(),  $request);
-
-            return $this->render('subject/show.html.twig',[
-                'form'=>$result['form'],
-                'subject' =>$result['subject']
-            ]);
         } catch (NotFoundHttpException $e) {
             return $this->render('errors/404.html.twig');
         }
@@ -127,6 +98,36 @@ class SubjectController extends AbstractController
         $this->subjectRepository->remove($subject);
 
         return $this->redirectToRoute('subjects_index');
+    }
+
+    #[Route('/{slug}/show/request-review', name : 'request_review')]
+    public function requestReview(Subject $subject, Request $request)
+    {
+
+        $result = $this->subjectService->requestReview($subject, $request, $this->getUser());
+        if(true === $result)
+        {
+            return $this->redirectToRoute('subjects_index');
+        }
+        return $this->render('subject/show.html.twig', [
+            'form'=>$result['form'],
+            'subject' =>$result['subject']
+        ]);
+    }
+
+    #[Route('/{slug}/{state}/show/review', name: 'review')]
+    public function review(Subject $subject, string $state = null, Request $request)
+    {
+        try {
+            $result = $this->subjectService->review($subject, $state, $this->getUser(),  $request);
+
+            return $this->render('subject/show.html.twig',[
+                'form'=>$result['form'],
+                'subject' =>$result['subject']
+            ]);
+        } catch (NotFoundHttpException $e) {
+            return $this->render('errors/404.html.twig');
+        }
     }
 
     /**
