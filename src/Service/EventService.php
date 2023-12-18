@@ -24,7 +24,7 @@ class EventService
         private PaginatorService $paginatorService,
         private EventsRepository $eventRepository, private FormFactoryInterface $formFactory,private SluggerInterface $slugger,
         private EntityManagerInterface $em, private ValidatorInterface $validator,
-        private SubscriptionRepository $subscriptionRepository
+        private SubscriptionRepository $subscriptionRepository,
     ){}
 
 
@@ -152,4 +152,22 @@ class EventService
         return true;
 
     }
+
+    public function getSubscribers(Events $event = null, Request $request): array
+    {
+        if (!$event) {
+            throw new NotFoundHttpException('Evenement  Introuvable');
+        }
+        $subscribers= [];
+        foreach ($event->getSubscriptions() as $subscriber)
+        {
+            $subscribers[] = $subscriber->getUser();
+        }
+        return [
+            'subscribers'=>$this->paginatorService->paginate($subscribers,$request),
+            'event' =>$event
+        ];
+    }
+
+
 }
