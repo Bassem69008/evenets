@@ -58,11 +58,15 @@
 
                         <td>
                             {% if is_granted('ROLE_BOARD') %}
-                            <a href="{{ path('events_edit', {slug:event.slug}) }}" type="button" class="btn btn-warning">EDIT</a>
+                            <a href="{{ path('events_edit', {slug:event.slug}) }}" type="button" class="btn btn-warning"><i class="fa fa-edit"></i></a>
                             {% endif %}
-                            <a href="{{ path('events_show',{slug:event.slug}) }}" type="button" class="btn btn-info">Afficher</a>
+                            <a href="{{ path('events_show',{slug:event.slug}) }}" type="button" class="btn btn-info"><i class="fa fa-eye"></i></a>
+                            <a href="{{ path('events_subscribers',{slug:event.slug}) }}" type="button" class="btn btn-info"><i class="fa fa-file"></i></a>
+
                             {% if app.user == event.createdBy %}
-                                <a href="#" data-toggle="modal" type="button" class="btn btn-danger" data-target="#ModalDeleteEvent" data-parametre={{ event.id }}> Supprimer</a>
+                                <a href="#" data-toggle="modal" type="button" class="btn btn-danger" data-target="#ModalDeleteEvent" data-parametre={{ event.id }}>
+                                    <i class="fa fa-trash"></i>
+                                </a>
                             {%  endif %}
                         </td>
 
