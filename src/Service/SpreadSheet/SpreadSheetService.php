@@ -2,8 +2,12 @@
 
 namespace App\Service\SpreadSheet;
 
+use App\Entity\Entity;
+use App\Entity\Study;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use function date;
+use function sprintf;
 
 class SpreadSheetService
 {
@@ -14,37 +18,34 @@ class SpreadSheetService
 
     }
 
-    public function manage(array $columnValues, array $columnNames, )
+    public function create(array $columnValues, array $columnNames): Spreadsheet
     {
         $spreadsheet = new Spreadsheet();
 
         // Get active sheet - it is also possible to retrieve a specific sheet
         $sheet = $spreadsheet->getActiveSheet();
 
-        // Set cell name and merge cells
-        $sheet->setCellValue('A1', 'Browser characteristics')->mergeCells('A1:D1');
 
         // Set column names
-
         $columnLetter = 'A';
         foreach ($columnNames as $columnName) {
             // Allow to access AA column if needed and more
+            $sheet->setCellValue($columnLetter.'1', $columnName);
             $columnLetter++;
-            $sheet->setCellValue($columnLetter.'2', $columnName);
         }
 
-
-        $i = 3; // Beginning row for active sheet
+        // set column values
+        $i = 2; // Beginning row for active sheet
         foreach ($columnValues as $columnValue) {
             $columnLetter = 'A';
             foreach ($columnValue as $value) {
+                $sheet->setCellValue($columnLetter.$i, $value);
                 $columnLetter++;
-            $sheet->setCellValue($columnLetter.$i, $value);
-        }
+            }
             $i++;
         }
 
-
         return $spreadsheet;
     }
+
 }
