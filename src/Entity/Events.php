@@ -31,7 +31,7 @@ class Events
     #[ORM\Column]
     private ?\DateTime $date = null;
 
-    #[ORM\OneToMany(mappedBy: 'events', targetEntity: Subject::class, cascade: ["persist", "remove"])]
+    #[ORM\OneToMany(mappedBy: 'events', targetEntity: Subject::class, cascade: ['persist', 'remove'])]
     private Collection $subjects;
 
     #[ORM\ManyToOne(inversedBy: 'events_created')]

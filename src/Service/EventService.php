@@ -1,37 +1,36 @@
 <?php
 
 namespace App\Service;
+
+use App\Entity\Events;
 use App\Entity\Subject;
 use App\Entity\Subscription;
-use App\Form\CreateEventType;
-use App\Form\CreateSubjectType;
-use App\Repository\SubscriptionRepository;
-use App\Service\PaginatorService;
-use App\Repository\EventsRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use App\Entity\User;
-use App\Entity\Events;
+use App\Form\CreateEventType;
+use App\Repository\EventsRepository;
+use App\Repository\SubscriptionRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+
 use function dd;
 
 class EventService
 {
     public function __construct(
         private PaginatorService $paginatorService,
-        private EventsRepository $eventRepository, private FormFactoryInterface $formFactory,private SluggerInterface $slugger,
+        private EventsRepository $eventRepository, private FormFactoryInterface $formFactory, private SluggerInterface $slugger,
         private EntityManagerInterface $em, private ValidatorInterface $validator,
         private SubscriptionRepository $subscriptionRepository,
-    ){}
-
+    ) {
+    }
 
     public function events(Request $request)
     {
-        return $this->paginatorService->paginate($this->eventRepository->findAll(),$request);
-
+        return $this->paginatorService->paginate($this->eventRepository->findAll(), $request);
     }
 
     public function create(User $user = null, Request $request)
@@ -64,7 +63,7 @@ class EventService
 
             foreach ($selectedSubjects as $subject) {
                 // probleme dans le add  => requieert set @ask @arnaud //
-                /** @var Subject $subject */
+                /* @var Subject $subject */
                 $subject->setEvents($event);
                 $this->em->persist($subject);
             }
@@ -72,22 +71,22 @@ class EventService
             $this->em->flush();
 
             // Vérifier les sujets après flush
-           // dd($event->getSubjects());
+            // dd($event->getSubjects());
 
             return true;
         }
 
-        return ['form' => $form->createView(), 'event' => $event, 'mode'=>'create'];
+        return ['form' => $form->createView(), 'event' => $event, 'mode' => 'create'];
     }
 
     public function remove(Events $event): bool
     {
         $this->eventRepository->remove($event);
+
         return true;
     }
 
-
-    public function edit (Events $event= null , Request $request)
+    public function edit(Events $event = null, Request $request)
     {
         if (!$event) {
             throw new NotFoundHttpException('Evenement  Introuvable');
@@ -109,48 +108,41 @@ class EventService
             return true;
         }
 
-        return ['form' => $form->createView(), 'event' => $event, 'mode'=>'edit'];
+        return ['form' => $form->createView(), 'event' => $event, 'mode' => 'edit'];
     }
-
-
 
     public function subscription(Events $event, User $user, Request $request): bool
     {
-        if(!$user || !$event)
-        {
+        if (!$user || !$event) {
             return false;
         }
-
 
         $subscription = (new Subscription())
             ->setEvent($event)
             ->setUser($user)
-            ;
+        ;
         $this->subscriptionRepository->save($subscription);
         $user->addSubscription($subscription);
         $this->em->persist($user);
-       $this->em->flush();
-        return true;
+        $this->em->flush();
 
+        return true;
     }
 
     public function unsubscribe(Events $event, User $user, Request $request): bool
     {
-        if(!$user || !$event )
-        {
+        if (!$user || !$event) {
             return false;
         }
 
         $subscription = $this->subscriptionRepository->findOneByEvent($event);
-       // $event->removeSubscription($subscription);
+        // $event->removeSubscription($subscription);
         $this->em->remove($subscription);
         $this->em->flush();
 
-       // $this->subscriptionRepository->remove($subscription);
-
+        // $this->subscriptionRepository->remove($subscription);
 
         return true;
-
     }
 
     public function getSubscribers(Events $event = null, Request $request): array
@@ -158,16 +150,14 @@ class EventService
         if (!$event) {
             throw new NotFoundHttpException('Evenement  Introuvable');
         }
-        $subscribers= [];
-        foreach ($event->getSubscriptions() as $subscriber)
-        {
+        $subscribers = [];
+        foreach ($event->getSubscriptions() as $subscriber) {
             $subscribers[] = $subscriber->getUser();
         }
+
         return [
-            'subscribers'=>$this->paginatorService->paginate($subscribers,$request),
-            'event' =>$event
+            'subscribers' => $this->paginatorService->paginate($subscribers, $request),
+            'event' => $event,
         ];
     }
-
-
 }

@@ -4,7 +4,6 @@ namespace App\Service\Users;
 
 use App\Entity\User;
 use App\Form\UploadFileType;
-use App\Form\UserCreateType;
 use App\Repository\UserRepository;
 use App\Service\Emails\SendMailService;
 use App\Service\SpreadSheet\SpreadSheetService;
@@ -14,7 +13,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use function array_shift;
 
 class UploadUsersService extends UserService
 {
@@ -23,10 +21,8 @@ class UploadUsersService extends UserService
         parent::__construct($formFactory, $em, $mail, $encoder, $userRepository, $entityService, $mailService, $sheetService);
     }
 
-
     public function uploadUsers(Request $request)
     {
-
         $form = $this->formFactory->create(UploadFileType::class);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -37,6 +33,7 @@ class UploadUsersService extends UserService
 
             return true;
         }
+
         return ['form' => $form->createView()];
     }
 
@@ -44,7 +41,7 @@ class UploadUsersService extends UserService
     {
         // on supprime tous les utilisateurs pour eviter la duplication
         $this->removeUsers();
-        array_shift($data);
+        \array_shift($data);
         foreach ($data as $row) {
             $password = $this->createPassword();
             $user = (new User())
@@ -57,16 +54,13 @@ class UploadUsersService extends UserService
             ;
 
             $this->sendMail($user, $password);
-            $user->setPassword($this->encoder->hashPassword($user,$password));
+            $user->setPassword($this->encoder->hashPassword($user, $password));
             $this->userRepository->save($user);
-
         }
-
     }
 
     public function sendMail(User $user, string $password): void
     {
-
         $this->mail->send(
             'no-reply@monsite.net',
             $user->getEmail(),
@@ -74,7 +68,7 @@ class UploadUsersService extends UserService
             'addUser',
             [
                 'user' => $user,
-                'password' => $password
+                'password' => $password,
             ]
         );
     }

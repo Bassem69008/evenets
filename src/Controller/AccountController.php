@@ -8,34 +8,32 @@ use App\Repository\UserRepository;
 use App\Service\AccountService;
 use App\Service\PaginatorService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-
 
 class AccountController extends AbstractController
 {
-
     public function __construct(private AccountService $accountService, private SubjectRepository $subjectRepository,
-    private UserRepository $userRepository, private PaginatorService $paginator){}
-
-    #[Route('/profil', name:'profile')]
-    #[IsGranted("IS_AUTHENTICATED_FULLY")]
-    public function profil(): Response
+        private UserRepository $userRepository, private PaginatorService $paginator)
     {
-
-       return $this->render('account/profil.html.twig',[
-           'user'=>$this->getUser()
-       ]);
     }
 
-    #[Route('/profil/{id}/edit', name:'profile_edit')]
-    #[IsGranted("IS_AUTHENTICATED_FULLY")]
-    public function edit(User $user=null, Request $request)
+    #[Route('/profil', name: 'profile')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function profil(): Response
     {
+        return $this->render('account/profil.html.twig', [
+            'user' => $this->getUser(),
+        ]);
+    }
 
+    #[Route('/profil/{id}/edit', name: 'profile_edit')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function edit(User $user = null, Request $request): Response
+    {
         try {
             $result = $this->accountService->editProfile($user, $request);
 
@@ -47,21 +45,18 @@ class AccountController extends AbstractController
         } catch (NotFoundHttpException $e) {
             return $this->render('errors/404.html.twig');
         }
-
     }
 
-    #[Route('/profil/{id}/sujets', name:'profile_subjects')]
-    #[IsGranted("IS_AUTHENTICATED_FULLY")]
-    public function subjects(User $user=null, Request $request)
+    #[Route('/profil/{id}/sujets', name: 'profile_subjects')]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function subjects(User $user = null, Request $request): Response
     {
-        if(!$user)
-        {
+        if (!$user) {
             return $this->render('errors/404.html.twig');
         }
-        return $this->render('account/subjects.html.twig',[
+
+        return $this->render('account/subjects.html.twig', [
             'pagination' => $this->paginator->paginate($user->getSubjects(), $request),
         ]);
-
-
     }
 }

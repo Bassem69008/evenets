@@ -53,7 +53,7 @@ class Subject
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?User $updated_by = null;
 
-    #[ORM\ManyToOne(inversedBy: 'subjects', cascade: ["persist", "remove"])]
+    #[ORM\ManyToOne(inversedBy: 'subjects', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Events $events = null;
 

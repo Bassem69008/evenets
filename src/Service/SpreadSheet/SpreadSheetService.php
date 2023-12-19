@@ -2,20 +2,16 @@
 
 namespace App\Service\SpreadSheet;
 
-use App\Entity\Entity;
-use App\Entity\Study;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use function date;
-use function sprintf;
 
 class SpreadSheetService
 {
     public function processFile($uploadedFile): array
     {
         $spreadsheet = IOFactory::load($uploadedFile);
-        return $spreadsheet->getActiveSheet()->toArray(null, true, true, false);
 
+        return $spreadsheet->getActiveSheet()->toArray(null, true, true, false);
     }
 
     public function create(array $columnValues, array $columnNames): Spreadsheet
@@ -25,13 +21,12 @@ class SpreadSheetService
         // Get active sheet - it is also possible to retrieve a specific sheet
         $sheet = $spreadsheet->getActiveSheet();
 
-
         // Set column names
         $columnLetter = 'A';
         foreach ($columnNames as $columnName) {
             // Allow to access AA column if needed and more
             $sheet->setCellValue($columnLetter.'1', $columnName);
-            $columnLetter++;
+            ++$columnLetter;
         }
 
         // set column values
@@ -40,12 +35,11 @@ class SpreadSheetService
             $columnLetter = 'A';
             foreach ($columnValue as $value) {
                 $sheet->setCellValue($columnLetter.$i, $value);
-                $columnLetter++;
+                ++$columnLetter;
             }
-            $i++;
+            ++$i;
         }
 
         return $spreadsheet;
     }
-
 }

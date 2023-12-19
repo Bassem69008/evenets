@@ -6,3 +6,8 @@ parameters:
         - public/
         - src/
         - tests/
+    ignoreErrors:
+        - '#is never read#'
+        - '#is never written, only read.#'
+        - '#Negated boolean expression is always false.#'
+

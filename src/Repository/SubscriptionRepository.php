@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Entity\Subject;
 use App\Entity\Subscription;
 use App\Repository\Trait\RemoveTrait;
 use App\Repository\Trait\SaveTrait;
@@ -21,10 +20,9 @@ class SubscriptionRepository extends ServiceEntityRepository
 {
     use SaveTrait;
     use RemoveTrait;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Subscription::class);
     }
-
-
 }
