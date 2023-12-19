@@ -19,6 +19,7 @@ class EventsRepository extends ServiceEntityRepository
 {
     use SaveTrait;
     use RemoveTrait;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Events::class);
@@ -26,7 +27,6 @@ class EventsRepository extends ServiceEntityRepository
 
     public function findAll()
     {
-        return $this->findBy(array(), array('created_at' => 'DESC'));
+        return $this->findBy([], ['created_at' => 'DESC']);
     }
-
 }

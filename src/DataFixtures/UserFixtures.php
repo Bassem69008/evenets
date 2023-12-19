@@ -17,7 +17,7 @@ class UserFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        /** Create Admin  */
+        /** Create fix  Admin  */
         $admin = new User();
         $admin->setLastname('Rahali');
         $admin->setFirstname('Bassem');
@@ -29,7 +29,7 @@ class UserFixtures extends Fixture
 
         $manager->persist($admin);
 
-        /** Create Board  */
+        /** Create fix Board  */
         $board = new User();
         $board->setLastname('Ronaldo');
         $board->setFirstname('Cristiano');
@@ -41,7 +41,7 @@ class UserFixtures extends Fixture
 
         $manager->persist($board);
 
-        /** Create User  */
+        /** Create fix User  */
         $user = new User();
         $user->setLastname('Messi');
         $user->setFirstname('Lionel');

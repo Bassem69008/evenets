@@ -5,9 +5,9 @@ namespace App\Entity;
 use App\Entity\Trait\CreatedAtTrait;
 use App\Repository\CommentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
 class Comment
@@ -34,13 +34,11 @@ class Comment
     private ?Subject $subjects = null;
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'comments')]
-    #[ORM\JoinColumn(onDelete:'CASCADE')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?self $parent = null;
 
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class)]
     private Collection $comments;
-
-
 
     public function __construct()
     {
@@ -142,6 +140,4 @@ class Comment
 
         return $this;
     }
-
-
 }

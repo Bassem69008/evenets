@@ -2,10 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Comment;
 use App\Entity\Subject;
 use App\Entity\SubjectLike;
-use App\Form\CommentType;
 use App\Repository\SubjectLikeRepository;
 use App\Repository\SubjectRepository;
 use App\Service\PaginatorService;
@@ -17,12 +15,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Workflow\WorkflowInterface;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/sujets', name: 'subjects_')]
-#[IsGranted("IS_AUTHENTICATED_FULLY")]
+#[IsGranted('IS_AUTHENTICATED_FULLY')]
 class SubjectController extends AbstractController
 {
     public function __construct(
@@ -43,7 +41,7 @@ class SubjectController extends AbstractController
         ]);
     }
 
-    #[Route('/{slug}/show', name: 'show', methods: ['GET','POST'])]
+    #[Route('/{slug}/show', name: 'show', methods: ['GET', 'POST'])]
     public function show(Subject $subject = null, Request $request): Response
     {
         try {
@@ -65,7 +63,7 @@ class SubjectController extends AbstractController
         if ($this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException('not allowed');
         }
-        $result = $this->subjectService->create( $this->getUser(),$request);
+        $result = $this->subjectService->create($this->getUser(), $request);
         if (true === $result) {
             return $this->redirectToRoute('subjects_index');
         }
@@ -103,15 +101,14 @@ class SubjectController extends AbstractController
     #[Route('/{slug}/show/request-review', name : 'request_review')]
     public function requestReview(Subject $subject, Request $request)
     {
-
         $result = $this->subjectService->requestReview($subject, $request, $this->getUser());
-        if(true === $result)
-        {
+        if (true === $result) {
             return $this->redirectToRoute('subjects_index');
         }
+
         return $this->render('subject/show.html.twig', [
-            'form'=>$result['form'],
-            'subject' =>$result['subject']
+            'form' => $result['form'],
+            'subject' => $result['subject'],
         ]);
     }
 
@@ -119,11 +116,11 @@ class SubjectController extends AbstractController
     public function review(Subject $subject, string $state = null, Request $request)
     {
         try {
-            $result = $this->subjectService->review($subject, $state, $this->getUser(),  $request);
+            $result = $this->subjectService->review($subject, $state, $this->getUser(), $request);
 
-            return $this->render('subject/show.html.twig',[
-                'form'=>$result['form'],
-                'subject' =>$result['subject']
+            return $this->render('subject/show.html.twig', [
+                'form' => $result['form'],
+                'subject' => $result['subject'],
             ]);
         } catch (NotFoundHttpException $e) {
             return $this->render('errors/404.html.twig');

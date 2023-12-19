@@ -2,120 +2,71 @@
 
 namespace App\Controller\Admin;
 
+use App\Controller\CrudController;
 use App\Entity\User;
-use App\Form\UploadFileType;
-use App\Repository\UserRepository;
 use App\Service\PaginatorService;
-use App\Service\Emails\SendMailService;
-use App\Service\Users\UploadUsersService;
 use App\Service\UserService;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/admin/users', name: 'users_')]
 #[IsGranted('ROLE_ADMIN')]
-class UsersController extends AbstractController
+class UsersController extends CrudController
 {
-    public function __construct(
-        private UserService $userService, private UserRepository $userRepository,
-        private UserPasswordHasherInterface $encoder, private SendMailService $mail,
-        private PaginatorService $paginator,
-        private UploadUsersService $uploadUsersService
-    ) {
+    public const INDEX_USERS_TEMPLATE = 'admin/users/index.html.twig';
+    public const INDEX_USERS_REDIRECTION = 'users_index';
+    public const ADD_UPDATE_TEMPLATE = 'admin/users/addEdit.html.twig';
+
+    public function __construct(PaginatorService $paginatorService, EntityManagerInterface $entityManager, private readonly UserService $userService)
+    {
+        parent::__construct($paginatorService, $entityManager);
     }
 
     #[Route('', name: 'index', methods: ['GET'])]
     public function index(Request $request): Response
     {
-
-       if (!$this->isGranted('ROLE_ADMIN')) {
-            return $this->render('errors/403.html.twig');
-        }
-
-        return $this->render('admin/users/index.html.twig', [
-            'pagination' => $this->paginator->paginate($this->userRepository->findAll(), $request),
-        ]);
+        return $this->indexWithPagination($request, self::INDEX_USERS_TEMPLATE, User::class, true, CrudController::ROLE_ADMIN);
     }
 
     #[Route('/{id}/show', name: 'show', methods: ['get'])]
     public function show(User $user = null): Response
     {
-        if (!$user) {
-            return $this->render('errors/404.html.twig');
-        }
-
-        return $this->render('admin/users/show.html.twig', \compact('user'));
+        return $this->showEntity($user, 'admin/users/show.html.twig');
     }
 
-    #[Route('/creation', name: 'create', methods: ['GET','POST'])]
-    public function add(Request $request)
+    #[Route('/creation', name: 'create', methods: ['GET', 'POST'])]
+    public function add(Request $request): Response
     {
-        if (!$this->isGranted('ROLE_ADMIN')) {
-            throw $this->createAccessDeniedException('not allowed');
-        }
-        try{
-
-            $result = $this->userService->create($request);
-
-            if (true === $result) {
-                return $this->redirectToRoute('users_index');
-            }
-            return $this->render('admin/users/add.html.twig', $result);
-        }catch(\Exception $e)
-        {
-            return $e->getMessage();
-        }
+        return $this->addEntity($this->userService, CrudController::ROLE_ADMIN, self::INDEX_USERS_REDIRECTION, self::ADD_UPDATE_TEMPLATE, $request, true);
     }
 
     #[Route('/{id}/edit', name: 'edit')]
-    public function edit(User $user = null, Request $request)
+    public function edit(User $user = null, Request $request): Response
     {
-        try {
-            $result = $this->userService->edit($user, $request);
-
-            if (true === $result) {
-                return $this->redirectToRoute('users_index');
-            }
-
-            return $this->render('admin/users/add.html.twig', $result);
-        }catch(NotFoundHttpException $e)
-        {
-            return $this->render('errors/404.html.twig');
-        }
+        return $this->editEntity($user, $this->userService, self::INDEX_USERS_REDIRECTION, self::ADD_UPDATE_TEMPLATE, CrudController::ROLE_ADMIN, $request, true);
     }
 
-
     #[Route('/{id}/delete', name: 'delete', methods: ['get'])]
-    public function delete(User $user = null, Request $request)
+    public function delete(User $user = null, Request $request): Response
     {
-        try{
-            $this->userService->delete($user, $request);
-            return $this->redirectToRoute('users_index');
-        }catch(NotFoundHttpException $e)
-        {
-            return $this->render('errors/404.html.twig');
-        }
+        return $this->deleteEntity($user, $this->userService, self::INDEX_USERS_REDIRECTION, $request);
     }
 
     #[Route('/upload', name: 'upload')]
-    public function upload(Request $request)
+    public function upload(Request $request): Response
     {
-        try{
-           $result= $this->uploadUsersService->uploadUsers($request);
-           if(true === $result)
-           {
-               return $this->redirectToRoute('users_index');
-           }
-            return $this->render('upload/upload.html.twig', $result);
-        }catch(\Exception $e)
-        {
-            return $e->getMessage();
-        }
+        try {
+            $result = $this->uploadUsersService->uploadUsers($request);
+            if (true === $result) {
+                return $this->redirectToRoute(self::INDEX_USERS_REDIRECTION);
+            }
 
+            return $this->render('upload/upload.html.twig', $result);
+        } catch (\Exception $e) {
+            return new Response($e->getMessage());
+        }
     }
 }
