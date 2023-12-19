@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Service\SpreadSheet;
+namespace App\Service\SpreadSheet\Event;
 
 use App\Entity\Events;
-use Symfony\Component\HttpFoundation\Request;
+use App\Service\SpreadSheet\SpreadSheetService;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use function sprintf;
 
 class ExportSubscribersService extends SpreadSheetService
 {
@@ -13,7 +15,8 @@ class ExportSubscribersService extends SpreadSheetService
         'Prénom',
         'Émail'
     ];
-    public function exportSubscribers(Events $event = null, Request $request)
+    public const EXTENSION = 'csv';
+    public function exportSubscribers(Events $event = null): array
     {
         if (!$event) {
             throw new NotFoundHttpException('Evenement  Introuvable');
@@ -26,8 +29,22 @@ class ExportSubscribersService extends SpreadSheetService
             $subscribers[$key]['email']= $subscriber->getUser()->getEmail();
         }
 
-        return $this->manage($subscribers, self::COLUMN_NAMES);
+        return [
+            'spreadsheet' => $this->create($subscribers, self::COLUMN_NAMES),
+            'filename'    => $this->getFileName($event),
+        ];
 
+
+
+    }
+
+    private function getFileName(Events $event)
+    {
+        return sprintf('Event_%s_%s.%s',
+        $event->getId(),
+        $event->getCreatedAt()->format('d-m-Y'),
+        self::EXTENSION
+        );
     }
 
 }
