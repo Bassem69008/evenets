@@ -13,7 +13,6 @@ use App\Service\Utils\CrudEntityService;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 class SubjectService
@@ -24,9 +23,8 @@ class SubjectService
         private WorkflowInterface $subjectPublishing,
         private SubjectRepository $subjectRepository,
         private FormFactoryInterface $formFactory,
-        private SluggerInterface $slugger,
         private CommentRepository $commentRepository,
-        private CrudEntityService $entityService
+        private CrudEntityService $entityService,
     ) {
     }
 
@@ -68,40 +66,37 @@ class SubjectService
 
     public function requestReview(Subject $subject = null, Request $request, User $user)
     {
-        $this->subjectPublishing->can($subject, 'to_review');
-        $subject->setStatus(Subject::STATUS_REVIEWED);
-
-        return $this->createComment($subject, $user, $request);
+        $this->subjectPublishing->apply($subject,Subject::REVIEWED_TRANSITION);
+        $this->subjectRepository->save($subject);
+        return true;
     }
 
-    public function review(Subject $subject = null, string $state = null, User $user, Request $request): mixed
+    public function review(Subject $subject = null, string $state = null, User $user, Request $request): bool
     {
         if (!$subject) {
             throw new NotFoundHttpException('Sujet non trouvé');
         }
-        /* remettre apply */
-        $this->subjectPublishing->can($subject, Subject::PUBLISH_TRANSITION);
-        $this->subjectPublishing->can($subject, Subject::REJECT_TRANSITION);
 
-        $comment = $this->createComment($subject, $user, $request);
+
 
         switch ($state) {
             case 'publish':
-                $subject->setStatus(Subject::STATUS_PUBLISHED);
+                $this->subjectPublishing->apply($subject,Subject::PUBLISH_TRANSITION);
                 break;
             case 'reject':
-                $subject->setStatus(Subject::STATUS_DRAFT);
+                $this->subjectPublishing->apply($subject,Subject::REJECT_TRANSITION);
                 break;
             default:
                 throw new NotFoundHttpException('unknownState');
         }
 
         $this->subjectRepository->save($subject);
+        return true;
 
-        return $comment;
+        //return $comment;
     }
 
-    public function createComment(Subject $subject, User $user, Request $request): mixed
+    /*public function createComment(Subject $subject, User $user, Request $request): mixed
     {
         $comment = (new Comment())
             ->setUser($user)
@@ -119,5 +114,5 @@ class SubjectService
         }
 
         return ['form' => $form->createView(), 'subject' => $subject];
-    }
+    } */
 }

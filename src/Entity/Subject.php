@@ -18,11 +18,10 @@ class Subject
     use UpdatedAtTrait;
     use SlugTrait;
 
-    public const STATUS_PUBLISHED = 'published';
-    public const STATUS_REVIEWED = 'reviewed';
-    public const STATUS_DRAFT = 'draft';
+    public const REVIEWED_TRANSITION= 'to_review';
     public const PUBLISH_TRANSITION = 'publish';
     public const REJECT_TRANSITION = 'reject';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

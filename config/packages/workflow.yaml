@@ -16,10 +16,7 @@ framework:
                 - rejected
                 - published
             transitions:
-                draft:
-                    guard: "is_granted('ROLE_BOARD')"
-                    from: rejected
-                    to: draft
+
                 to_review:
                     guard: "is_granted('ROLE_BOARD')"
                     from: draft
@@ -31,4 +28,4 @@ framework:
                 reject:
                     guard: "is_granted('ROLE_BOARD')"
                     from: reviewed
-                    to:   rejected
+                    to:   draft
