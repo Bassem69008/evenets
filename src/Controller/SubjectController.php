@@ -101,6 +101,7 @@ class SubjectController extends AbstractController
     #[Route('/{slug}/show/request-review', name : 'request_review')]
     public function requestReview(Subject $subject, Request $request)
     {
+
         $result = $this->subjectService->requestReview($subject, $request, $this->getUser());
         if (true === $result) {
             return $this->redirectToRoute('subjects_index');
@@ -117,10 +118,14 @@ class SubjectController extends AbstractController
     {
         try {
             $result = $this->subjectService->review($subject, $state, $this->getUser(), $request);
+            if (true === $result) {
+                return $this->redirectToRoute('subjects_index');
+            }
+
 
             return $this->render('subject/show.html.twig', [
-                'form' => $result['form'],
-                'subject' => $result['subject'],
+               // 'form' => $result['form'],
+               // 'subject' => $result['subject'],
             ]);
         } catch (NotFoundHttpException $e) {
             return $this->render('errors/404.html.twig');
