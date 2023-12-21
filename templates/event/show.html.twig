@@ -1,18 +1,18 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    {% if event.subjects|length() > 0 %}
+    {% if events.subjects|length() > 0 %}
     <div class="event">
         <div class="container my-4 pb-5" style="min-height:100%;">
             <div class="row">
                 <div class="col-lg-12">
                     <div class="d-flex justify-content-between">
-                        <h2>{{ event.title }}</h2>
+                        <h2>{{ events.title }}</h2>
 
                         {% set currentUserID = app.user.id %}
                         {% set userAlreadySubscribed = false %}
 
-                        {% for subscription in event.subscriptions %}
+                        {% for subscription in events.subscriptions %}
                             {% if currentUserID == subscription.user.id %}
                                 {% set userAlreadySubscribed = true %}
                                 {# Vous pouvez ajouter d'autres actions ici si nécessaire #}
@@ -21,9 +21,9 @@
 
                         {% if userAlreadySubscribed %}
                             <p class="badge badge-success">Vous êtes déjà inscrit</p>
-                            <a href="{{ path('events_unsubscribe',{slug:event.slug}) }}" class="btn btn-danger">Se désinscrire</a>
+                            <a href="{{ path('events_unsubscribe',{slug:events.slug}) }}" class="btn btn-danger">Se désinscrire</a>
                         {% else %}
-                            <a href="{{ path('events_subscription', { slug: event.slug }) }}" class="btn btn-primary  text-white">
+                            <a href="{{ path('events_subscription', { slug: events.slug }) }}" class="btn btn-primary  text-white">
                                 <i class="far fa-ticket-alt"></i> S'inscrire
                             </a>
                         {% endif %}
@@ -33,11 +33,11 @@
 
 
                     </div>
-                    <p>{{ event.description }}</p>
+                    <p>{{ events.description }}</p>
 
 
 
-                  {% for subject in event.subjects %}
+                  {% for subject in events.subjects %}
 
 
                         <div class="tab-content py-3 px-3 px-sm-0 wow fadeInDown animated" data-animation="fadeInDown animated" data-delay=".2s" id="nav-tabContent" style="visibility: visible; animation-name: fadeInDown;">
@@ -86,8 +86,41 @@
             </div>
         </div>
     </div>
+
+
+        <!----------------------------COMMENTS -------------------------------->
+        <div class="comment-section" id="comment-section" >
+            <h2 class="mt-3">Commentaires</h2>
+
+            <!-- comment public -->
+            <div id="" class=" p-2 col-lg-12 " >
+                {{ form_start(form) }}
+                <div class="d-flex flex-row align-items-start">
+                    <div class=""><img class="rounded-circle" src="https://i.imgur.com/RpzrMR2.jpg" width="40"></div>
+                    <div class="col">
+                        <!-- form -->
+
+                        {{ form_widget(form.content) }}
+
+                    </div>
+                </div>
+                <div class="mt-2 text-right">
+                    <button  type="submit" class="btn btn-primary btn-sm shadow-none" type="button">publier</button>
+                    <button class="btn btn-outline-primary btn-sm ml-1 shadow-none" type="button">Cancel</button>
+                </div>
+                {{ form_end(form) }}
+            </div>
+            <!-- end comment public -->
+
+            {% for comment in events.comments|sort((a, b) => a.createdAt.timestamp - b.createdAt.timestamp) %}
+                {{ include('partials/_comments.html.twig', { 'comment': comment, 'form': form, 'object': events ,'type':'event'}) }}
+            {% endfor %}
+
+        </div>
+
+        <!---------------------------- END COMMENTS ---------------------------->
     {% else %}
         <p class="text-danger">Vous n'avez pas de sujets en cours veuillez rajouter</p>
-        <a href="{{ path('events_edit',{slug:event.slug}) }}" class="btn btn-primary">Ajouter</a>
+        <a href="{{ path('events_edit',{slug:events.slug}) }}" class="btn btn-primary">Ajouter</a>
     {% endif %}
 {% endblock %}

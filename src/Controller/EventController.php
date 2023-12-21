@@ -21,7 +21,7 @@ class EventController extends AbstractController
     {
     }
 
-    #[Route('', name: 'index')]
+    #[Route('/board', name: 'index')]
     public function index(Request $request): Response
     {
         return $this->render('event/index.html.twig', [
@@ -29,12 +29,29 @@ class EventController extends AbstractController
         ]);
     }
 
+    #[Route('', name: 'index_users')]
+    public function indexUsers(Request $request): Response
+    {
+        return $this->render('event/events.html.twig', [
+            'pagination' => $this->eventService->events($request),
+        ]);
+    }
+
+
+
     #[Route('/{slug}/show', name: 'show')]
     public function show(Events $event, Request $request): Response
     {
-        return $this->render('event/show.html.twig', [
-            'event' => $event,
-        ]);
+        try {
+            $result = $this->eventService->show($event, $this->getUser(), $request);
+            if (true === $result) {
+                return $this->redirectToRoute('events_index');
+            }
+
+            return $this->render('event/show.html.twig', $result);
+        } catch (NotFoundHttpException $e) {
+            return $this->render('errors/404.html.twig');
+        }
     }
 
     #[Route('/creation', name: 'create')]
@@ -87,14 +104,13 @@ class EventController extends AbstractController
     #[Route('/{slug}/inscription', name: 'subscription')]
     public function subscription(Events $event = null, Request $request): Response
     {
-        $result = $this->eventService->subscription($event, $this->getUser(), $request);
+        $result = $this->eventService->subscribe($event, $this->getUser(), $request);
+
         if (false === $result) {
             return $this->render('errors/404.html.twig');
         }
 
-        return $this->render('event/show.html.twig', [
-            'event' => $event,
-        ]);
+        return $this->render('event/show.html.twig', $result);
     }
 
     #[Route('/{slug}/desinscription', name: 'unsubscribe')]
@@ -106,9 +122,7 @@ class EventController extends AbstractController
             return $this->render('errors/404.html.twig');
         }
 
-        return $this->render('event/show.html.twig', [
-            'event' => $event,
-        ]);
+        return $this->render('event/show.html.twig',$result);
     }
 
     #[Route('/{slug}', name: 'subscribers')]

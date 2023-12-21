@@ -1,33 +1,46 @@
 <nav class="navbar navbar-expand-lg navbar-white bg-white fixed-top" id="mainNav">
-  <a class="navbar-brand " href="{{ path('home') }}"><h1>Meetup <span  style="font-size:10px;">By Niji</span></h1></a>
+  <a class="navbar-brand " href="{{ path('home') }}"><h1>Meetup <span  style="font-size:10px;color:#ff007a;font-style: italic;">By Niji</span></h1></a>
   <button class="navbar-toggler bg-dark navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon" style="color:#fff !important;"></span>
   </button>
   <div class="collapse navbar-collapse " id="navbarResponsive">
     <ul class="navbar-nav navbar-sidenav " id="exampleAccordion">
 
-      {% if is_granted("ROLE_ADMIN") or is_granted("ROLE_BOARD") %}
-      <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
-        <a class="nav-link" href="{{ path('dashboard_index') }}">
-          <i class="fa fa-fw fa-dashboard"></i>
-          <span class="nav-link-text">Dashboard</span>
-        </a>
-      </li>
+      {% if is_granted("ROLE_BOARD") %}
+
+        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Components">
+          <a class="nav-link nav-link-collapse collapsed" data-toggle="collapse" href="#collapseBoard" data-parent="#exampleAccordion">
+            <i class="fa fa-fw fa-wrench"></i>
+            <span class="nav-link-text">Board</span>
+          </a>
+          <ul class="sidenav-second-level collapse" id="collapseBoard">
+            <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
+              <a class="nav-link" href="{{ path('dashboard_index') }}">
+                <i class="fa fa-fw fa-dashboard"></i>
+                <span class="nav-link-text">Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Utilisateurs">
+              <a class="nav-link" href="{{ path('comments_index') }}">
+                <i class="fa fa-fw fa-users"></i>
+                <span class="nav-link-text">Commentaires</span>
+              </a>
+            </li>
+            <li>
+              <a href="{{ path('events_index') }}"><i class="fa fa-calendar text-dark"></i>
+                <span>Évenements</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+
+
       {% endif %}
       {% if is_granted("ROLE_ADMIN")  %}
         <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Utilisateurs">
           <a class="nav-link" href="{{ path('users_index') }}">
             <i class="fa fa-fw fa-users"></i>
             <span class="nav-link-text">Utilisateurs</span>
-          </a>
-        </li>
-      {% endif %}
-
-      {% if is_granted("ROLE_BOARD")  %}
-        <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Utilisateurs">
-          <a class="nav-link" href="{{ path('comments_index') }}">
-            <i class="fa fa-fw fa-users"></i>
-            <span class="nav-link-text">Commentaires</span>
           </a>
         </li>
       {% endif %}
@@ -46,7 +59,7 @@
         </a>
         <ul class="sidenav-second-level collapse" id="collapseEvents">
           <li>
-            <a href="{{ path('events_index') }}"><i class="fa-regular fa-calendar-days text-dark"></i>Évenements</a>
+            <a href="{{ path('events_index_users') }}"><i class="fa-regular fa-calendar-days text-dark"></i>Évenements</a>
           </li>
           <li>
             <a href="#">Créer un évennement</a>

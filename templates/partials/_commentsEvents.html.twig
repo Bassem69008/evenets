@@ -1,4 +1,4 @@
-{% if comment.isActive and comment.parent is null  %}
+{% if comment.isActive and comment.parent is null %}
 <div class="comment bg-white p-2" style="border-radius:10px;">
 
     <div class="d-flex flex-row user-info">
@@ -12,7 +12,7 @@
 
     <div class="mt-2">
         <p class="comment-text">{{ comment.content }}</p>
-        {% for com in comment.comments %}
+        {% for com in comment.commentsEvents %}
         {% if com.isActive %}
         <div class="d-flex flex-row user-info pl-4">
             <img class="rounded-circle" src="https://i.imgur.com/RpzrMR2.jpg" width="30" height="30">
@@ -39,8 +39,7 @@
             <div class="d-flex flex-row align-items-start">
                 <div class=""><img class="rounded-circle" src="https://i.imgur.com/RpzrMR2.jpg" width="40"></div>
                 <div class="col">
-
-                    <form action="{{ path('comments_create',{id:object.id, parent: comment.id,type:type }) }}"  method="post" name="formulario_login">
+                    <form action="{{ path('comments_create',{slug:comment.subjects.slug, parent: comment.id}) }}"  method="post" name="formulario_login">
                         <textarea class="form-control" name="_comment" id="_comment" cols="30" rows="10"></textarea>
                         <div class="mt-2 text-right">
                       <button type="submit" class="btn btn-primary btn-sm shadow-none" type="button">publier</button>

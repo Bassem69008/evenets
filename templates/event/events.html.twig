@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+{% block body %}
+    <section class="container mt-5 events pb-5 ">
+        <h1>Events</h1>
+
+        <div class="row">
+
+            {% for event in pagination %}
+
+                <div class="col-6 col-md-6 col-sm-12 mb-1">
+
+            <article class="card pb-2 " style="height:200px !important;max-height:200px !important;">
+
+                <section class="date">
+                    <time datetime="">
+                        <span>{{ event.date|date('d') }}</span><span>{{ event.date|date('F') }}</span>
+                    </time>
+                </section>
+                <section class="card-cont">
+                    <small>{{ event.createdBy.lastname }} {{ event.createdBy.firstname }}</small>
+                    <h3 class="text-primary">{{ event.title }}</h3>
+                    <div class="even-date pr-1">
+                        <i class="fa fa-calendar mr-1"></i>
+                        <time>
+                            <span> {{ event.date|format_datetime('full', locale='fr') }}</span>
+
+                        </time>
+                    </div>
+                    <div class="even-info ">
+                        <i class="fa fa-map-marker"></i>
+                        <p>
+                            nexen square for people australia, sydney
+                        </p>
+                    </div>
+
+
+                        {% if event.isSubscribed(app.user) %}
+                            <div  class="btn btn-success" style="    border-radius: 2px;
+    position: absolute;
+    right: 10px;
+    bottom: 10px">Inscris</div>
+                        {% else %}
+                            <a href="{{ path('events_show',{slug:event.slug}) }}" class="btn mt-20">En savoir plus</a>
+                        {% endif %}
+
+                </section>
+
+            </article>
+
+</div>
+
+            {% endfor %}
+
+        </div>
+
+        <div class="pagination my-3">
+            {{ knp_pagination_render(pagination, '/pagination/bootstrap_pagination.html.twig') }}
+        </div>
+    </section>
+{%  endblock %}

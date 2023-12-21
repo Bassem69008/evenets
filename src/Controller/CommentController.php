@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Comment;
+use App\Entity\Events;
 use App\Entity\Subject;
 use App\Repository\CommentRepository;
 use App\Service\CommentService;
@@ -27,24 +28,29 @@ class CommentController extends AbstractController
         if (!$this->isGranted('ROLE_BOARD')) {
             throw $this->createAccessDeniedException('not allowed');
         }
-        $comments = $this->commentRepository->findAll();
+
 
         return $this->render('comment/comments.html.twig', [
-            'comments' => $this->paginatorService->paginate($comments, $request),
+            'comments' => $this->paginatorService->paginate($this->commentRepository->findAll(), $request),
         ]);
     }
 
-    #[Route('/{slug}/{parent}/creation', name: 'create', methods: ['get', 'post'])]
-    public function create(Subject $subject = null, Comment $parent = null, Request $request)
+    #[Route('/{id}/{parent}/{type}/creation', name: 'create', methods: ['get', 'post'])]
+    public function create(Events $event=null, Subject $subject = null, string $type,Comment $parent = null, Request $request)
     {
+
         if ($this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException('not allowed');
         }
 
         $content = $request->get('_comment');
-        $result = $this->commentService->create($subject, $this->getUser(), $parent, $request, $content);
+        $result = $this->commentService->create($event,$subject, $this->getUser(), $parent, $request, $content, $type);
         if (true === $result['success']) {
-            return $this->redirectToRoute('subjects_show', ['slug' => $subject->getSlug()]);
+
+            return $type == Comment::COMMENT_SUBJECT ?
+                $this->redirectToRoute('subjects_show', ['slug' => $subject->getSlug()]) :
+                $this->redirectToRoute('events_show', ['slug' => $event->getSlug()])
+                ;
         }
 
         return $this->render('comment/index.html.twig', $result);

@@ -55,12 +55,18 @@ class Events
     #[ORM\OneToMany(mappedBy: 'event', targetEntity: Subscription::class, orphanRemoval: true)]
     private Collection $subscriptions;
 
+    #[ORM\OneToMany(mappedBy: 'event', targetEntity: Comment::class)]
+    private Collection $comments;
+
+
     public function __construct()
     {
         $this->subjects = new ArrayCollection();
         $this->created_at = new \DateTimeImmutable();
         $this->updated_at = new \DateTimeImmutable();
         $this->subscriptions = new ArrayCollection();
+        $this->comments = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -112,7 +118,7 @@ class Events
         return $this->subjects;
     }
 
-    public function addSubject(Subject $subject): static
+    public function addSubject(Subject $subject): self
     {
         if (!$this->subjects->contains($subject)) {
             $this->subjects->add($subject);
@@ -199,4 +205,48 @@ class Events
 
         return $this;
     }
+
+    public function isSubscribed(User $user): bool
+    {
+        foreach ($this->subscriptions as $subscription)
+        {
+            if($subscription->getUser()=== $user)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return Collection<int, Comment>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comment $comment): static
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setEvent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comment $comment): static
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getEvent() === $this) {
+                $comment->setEvent(null);
+            }
+        }
+
+        return $this;
+    }
+
+
 }
