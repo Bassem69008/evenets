@@ -2,13 +2,17 @@
 
 namespace App\Service;
 
+use App\Entity\Comment;
 use App\Entity\Events;
 use App\Entity\Subject;
 use App\Entity\Subscription;
 use App\Entity\User;
+use App\Form\CommentType;
 use App\Form\CreateEventType;
 use App\Repository\EventsRepository;
 use App\Repository\SubscriptionRepository;
+use App\Service\Utils\CrudEntityService;
+use App\Service\Utils\EntityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,12 +29,28 @@ class EventService
         private EventsRepository $eventRepository, private FormFactoryInterface $formFactory, private SluggerInterface $slugger,
         private EntityManagerInterface $em, private ValidatorInterface $validator,
         private SubscriptionRepository $subscriptionRepository,
+        private CrudEntityService $crudEntityService
     ) {
     }
 
     public function events(Request $request)
     {
         return $this->paginatorService->paginate($this->eventRepository->findAll(), $request);
+    }
+
+    public function show(Events $event = null, User $user, Request $request): mixed
+    {
+        if (!$event) {
+            throw new NotFoundHttpException('2vennement  non trouvé');
+        }
+
+        $comment = (new Comment())
+            ->setUser($user)
+            ->setEvent($event)
+            ->setType(Comment::COMMENT_EVENT);
+        ;
+
+        return $this->crudEntityService->createOrUpdate($comment, CommentType::class, $request, false, null, $event);
     }
 
     public function create(User $user = null, Request $request)
@@ -53,20 +73,23 @@ class EventService
             // Ajouter chaque sujet à l'événement
             foreach ($selectedSubjects as $subject) {
                 $event->addSubject($subject);
+
             }
 
             // Générer le slug
             $event->setSlug($this->slugger->slug($event->getTitle()));
 
-            // Persister l'événement et les sujets
-            $this->em->persist($event);
+
 
             foreach ($selectedSubjects as $subject) {
                 // probleme dans le add  => requieert set @ask @arnaud //
                 /* @var Subject $subject */
-                $subject->setEvents($event);
                 $this->em->persist($subject);
+                $subject->setEvents($event);
             }
+            // Persister l'événement et les sujets
+
+            $this->em->persist($event);
 
             $this->em->flush();
 
@@ -98,12 +121,16 @@ class EventService
             $selectedSubjects = $form->get('subjects')->getData();
 
             foreach ($selectedSubjects as $subject) {
+                /* @var Subject $subject */
                 $event->addSubject($subject);
+                $this->em->persist($subject);
+                $subject->setEvents($event);
             }
 
             $event->setSlug($this->slugger->slug($event->getTitle()));
 
-            $this->eventRepository->save($event);
+            $this->em->persist($event);
+            $this->em->flush();
 
             return true;
         }
@@ -111,7 +138,7 @@ class EventService
         return ['form' => $form->createView(), 'event' => $event, 'mode' => 'edit'];
     }
 
-    public function subscription(Events $event, User $user, Request $request): bool
+    public function subscribe(Events $event, User $user, Request $request): mixed
     {
         if (!$user || !$event) {
             return false;
@@ -126,10 +153,16 @@ class EventService
         $this->em->persist($user);
         $this->em->flush();
 
-        return true;
+        $comment = (new Comment())
+            ->setUser($user)
+            ->setEvent($event)
+            ->setType(Comment::COMMENT_EVENT);
+        ;
+
+        return $this->crudEntityService->createOrUpdate($comment, CommentType::class, $request, false, null, $event);
     }
 
-    public function unsubscribe(Events $event, User $user, Request $request): bool
+    public function unsubscribe(Events $event, User $user, Request $request): mixed
     {
         if (!$user || !$event) {
             return false;
@@ -142,7 +175,13 @@ class EventService
 
         // $this->subscriptionRepository->remove($subscription);
 
-        return true;
+        $comment = (new Comment())
+            ->setUser($user)
+            ->setEvent($event)
+            ->setType(Comment::COMMENT_EVENT);
+        ;
+
+        return $this->crudEntityService->createOrUpdate($comment, CommentType::class, $request, false, null, $event);
     }
 
     public function getSubscribers(Events $event = null, Request $request): array

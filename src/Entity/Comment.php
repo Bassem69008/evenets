@@ -12,6 +12,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
 class Comment
 {
+    public const COMMENT_SUBJECT="subject";
+    public const COMMENT_EVENT= "event";
     use CreatedAtTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -29,9 +31,12 @@ class Comment
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     private ?Subject $subjects = null;
+
+
+
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'comments')]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
@@ -39,6 +44,14 @@ class Comment
 
     #[ORM\OneToMany(mappedBy: 'parent', targetEntity: self::class)]
     private Collection $comments;
+
+    #[ORM\Column(length: 255)]
+    private ?string $type = null;
+
+    #[ORM\ManyToOne(inversedBy: 'comments')]
+    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    private ?Events $event = null;
 
     public function __construct()
     {
@@ -92,7 +105,7 @@ class Comment
         return $this->subjects;
     }
 
-    public function setSubjects(?Subject $subjects): static
+    public function setSubjects(?Subject $subjects): self
     {
         $this->subjects = $subjects;
 
@@ -140,4 +153,31 @@ class Comment
 
         return $this;
     }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): static
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getEvent(): ?Events
+    {
+        return $this->event;
+    }
+
+    public function setEvent(?Events $event): static
+    {
+        $this->event = $event;
+
+        return $this;
+    }
+
+
+
 }

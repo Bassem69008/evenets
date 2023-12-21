@@ -15,7 +15,7 @@ class CrudController extends AbstractController
     public const ROLE_ADMIN = 'ROLE_ADMIN';
     public const ROLE_BOARD = 'ROLE_BOARD';
     public const ACCESS_DENIED_PAGE = 'errors/403.html.twig';
-    public const NOT_FOUND_PAGE = 'errors/403.html.twig';
+    public const NOT_FOUND_PAGE = 'errors/404.html.twig';
 
     public function __construct(
         private PaginatorService $paginatorService,
@@ -53,7 +53,7 @@ class CrudController extends AbstractController
 
     public function addEntity($service, string $role = null, string $redirectionRoute, string $templateRender, Request $request, bool $isGranted = false)
     {
-        // check GrantedRole
+        // check Granted Role
         $this->checkGranted($isGranted, $role);
         try {
             $result = $service->create($request);

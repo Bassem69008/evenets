@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Comment;
+use App\Entity\Events;
 use App\Entity\Subject;
 use App\Entity\User;
 use App\Form\CommentType;
@@ -12,6 +13,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use function settype;
 
 class CommentService
 {
@@ -19,18 +21,20 @@ class CommentService
     {
     }
 
-    public function create(Subject $subject = null, User $user = null, Comment $parent = null, Request $request, ?string $content)
+    public function create(Events $event =null,Subject $subject = null, User $user = null, Comment $parent = null, Request $request, ?string $content, string $type)
     {
-        if (null == $subject || null == $user) {
+        if ( null == $user) {
             throw new BadRequestHttpException('Erreur de soumission');
         }
 
         $comment = (new Comment())
             ->setUser($user)
-            ->setSubjects($subject);
+            ->settype($type);
+       Comment::COMMENT_SUBJECT ? $comment->setSubjects($subject): $comment->setEvent($event);
+
 
         if (null !== $parent) {
-            return $this->createReply($comment, $parent, $content);
+            return $this->createReply($comment, $parent, $content, $type);
         }
 
         $form = $this->formFactory->create(CommentType::class, $comment);
@@ -45,14 +49,14 @@ class CommentService
         return ['success' => false, 'form' => $form->createView(), 'comment' => $comment];
     }
 
-    private function createReply(Comment $comment, Comment $parent, string $content)
+    private function createReply(Comment $comment, Comment $parent, string $content, string $type)
     {
         $comment->setParent($parent)
             ->setContent($content);
 
         $this->commentRepository->save($comment);
 
-        return ['success' => true, 'parent' => $parent, 'subject' => $parent->getSubjects()->getSlug(), 'comment' => $comment];
+        return ['success' => true, 'parent' => $parent, 'subject' => $type == Comment::COMMENT_SUBJECT ? $parent->getSubjects()->getSlug(): $parent->getEvent()->getSlug(), 'comment' => $comment];
     }
 
     public function manage(Comment $comment, ?string $state, Request $request): void
@@ -66,12 +70,9 @@ class CommentService
 
         match ($state) {
             'reject' => $this->commentRepository->remove($comment),
-            'publish' => $this->validate($comment)
+            'publish' => $this->commentRepository->save($comment->setIsActive(true))
         };
     }
 
-    private function validate(Comment $comment): void
-    {
-        $this->commentRepository->save($comment->setIsActive(true));
-    }
+
 }

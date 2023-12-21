@@ -84,7 +84,7 @@
       <!-- end comment public -->
 
       {% for comment in subject.comments|sort((a, b) => a.createdAt.timestamp - b.createdAt.timestamp) %}
-          {{ include('partials/_comments.html.twig', { 'comment': comment, 'form': form, 'subject': subject }) }}
+          {{ include('partials/_comments.html.twig', { 'comment': comment, 'form': form, 'object': subject ,'type':'subject'}) }}
       {% endfor %}
 
   </div>

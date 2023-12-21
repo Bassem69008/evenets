@@ -11,7 +11,7 @@
                         <tr>
                             <th scope="col">#</th>
                             <th scope="col">Commentaire</th>
-                            <th scope="col">Sujet</th>
+                            <th scope="col">Type</th>
                             <th scope="col">Status</th>
                             <th scope="col">Crée le </th>
                             <th scope="col">Édition</th>
@@ -25,7 +25,7 @@
 
                             <td>{{ comment.id }}</td>
                             <td>{{ comment.content |length > 50 ? comment.content|slice(0, 50) ~ '...' : comment.content }}</td>
-                            <td>{{ comment.subjects.title }}</td>
+                            <td>{{ comment.type =="subject" ? 'Sujet' : 'Évennement' }}</td>
                             <td>
                                 {%  if comment.isActive %}
                                 <i class="fa fa-circle text-success"></i>

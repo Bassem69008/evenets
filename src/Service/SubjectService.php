@@ -38,6 +38,7 @@ class SubjectService
         $comment = (new Comment())
             ->setUser($user)
             ->setSubjects($subject)
+            ->setType(Comment::COMMENT_SUBJECT);
         ;
 
         return $this->entityService->createOrUpdate($comment, CommentType::class, $request, false, null, $subject);

@@ -75,6 +75,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Subscription::class, orphanRemoval: true)]
     private Collection $subscriptions;
 
+    #[ORM\OneToMany(mappedBy: 'User', targetEntity: CommentsEvent::class, orphanRemoval: true)]
+    private Collection $commentsEvents;
+
     public function __construct()
     {
         $this->subjects = new ArrayCollection();
@@ -85,6 +88,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->created_at = new \DateTimeImmutable();
         $this->comments = new ArrayCollection();
         $this->subscriptions = new ArrayCollection();
+        $this->commentsEvents = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -421,6 +425,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($subscription->getUser() === $this) {
                 $subscription->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CommentsEvent>
+     */
+    public function getCommentsEvents(): Collection
+    {
+        return $this->commentsEvents;
+    }
+
+    public function addCommentsEvent(CommentsEvent $commentsEvent): static
+    {
+        if (!$this->commentsEvents->contains($commentsEvent)) {
+            $this->commentsEvents->add($commentsEvent);
+            $commentsEvent->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommentsEvent(CommentsEvent $commentsEvent): static
+    {
+        if ($this->commentsEvents->removeElement($commentsEvent)) {
+            // set the owning side to null (unless already changed)
+            if ($commentsEvent->getUser() === $this) {
+                $commentsEvent->setUser(null);
             }
         }
 
